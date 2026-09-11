@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="projectDropdown">
+  <div class="dropdown d-md-block d-none">
+    <div class="btn-drpdwn text-color1 para-f4 dmsans-semibold p-tb-10 p-lr-16" data-bs-toggle="dropdown">
+      Projects<i class="fa-solid fa-chevron-down ps-3"></i>
+    </div>
+    <div class="dropdown-menu w-320 py-0 custom-dropdown">
+      <div class="d-flex justify-content-between pe-4 ps-2 brdr-btm-1 py-3">
+        <div class="col-sm-6">
+          <p class="para-f3 dmsans-semibold px-2 text-color1">Your Projects</p>
+        </div>
+        <div class="col-sm-6 text-end">
+          <div class="para-f3 text-color3 dmsans-semibold"><a th:href="@{/projects}">View All</a></div>
+        </div>
+      </div>
+      <div class="dropdown-scroll overflow-y-auto">
+        <ul>
+          <li th:each="project : ${projects}" class="px-2 p-t-16 p-b-8">
+            <a class="dropdown-item d-flex justify-content-between" th:href="@{${project.projectUrl}}">
+                <span>
+                  <p class="dmsans-semibold text-color1" th:text="${project.projectName}">Project Name</p>
+                  <p class="text-color4 para-f4" th:text="${project.createdBy}">Creator</p>
+                </span>
+              <span><img th:src="@{/assets/images/project-check-icon.svg}" alt="icon"></span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="px-2 p-t-12 p-b-24">
+        <a class="btn btn-create p-tb-12 p-lr-16 text-white d-md-block d-none button-f2"
+           data-bs-toggle="modal" data-bs-target="#createProject">
+          <img th:src="@{/assets/images/create-test-icon.svg}" alt="Icon" class="pe-2">Create Project
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

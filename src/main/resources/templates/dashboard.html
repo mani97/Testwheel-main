@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<head>
+  <title>
+    TestWheel - Dashboard
+  </title>
+
+  <meta charset="utf-8">
+
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" th:href="@{/favicon.png}" />
+
+  <link th:href="@{assets/css/common-styles.css}" rel="stylesheet">
+  <link th:href="@{assets/css/login-styles.css}" rel="stylesheet">
+  <link th:href="@{assets/css/after-login-styles.css}" rel="stylesheet">
+  <link th:href="@{assets/css/bootstrap.min.css}" rel="stylesheet">
+  <link th:href="@{assets/fontawesome/css/all.min.css}" rel="stylesheet">
+  <link th:href="@{assets/css/alerts.css}" rel="stylesheet">
+
+  <!-- Project dropdown styles -->
+  <style>
+    .dropdown-menu.custom-dropdown {
+      display: none;
+      flex-direction: column;
+      width: 320px;
+      overflow: hidden;
+    }
+
+    .dropdown-menu.custom-dropdown.show {
+      display: flex;
+    }
+
+    .project-list {
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .project-footer {
+      flex-shrink: 0;
+      background: #fff;
+    }
+  </style>
+
+  <!-- Notification dropdown styles -->
+  <style>
+    .notification-dropdown {
+      width: 500px !important;
+      max-width: 90vw;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .notification-dropdown.show {
+      display: flex !important;
+    }
+
+    .notification-header {
+      flex-shrink: 0;
+      background: #fff;
+    }
+
+    .notification-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .notification-footer {
+      flex-shrink: 0;
+      background: #fff;
+      border-top: 1px solid #e5e5e5;
+    }
+  </style>
+
+
+</head>
+
+<body>
+
+
+  <!-- HEADER -->
+  <div class="page-wrapper">
+    <div class="header p-t-12 p-b-12">
+
+      <div class="d-flex align-items-center gap-3 gap-lg-5">
+        <!-- MOBILE BUTTON -->
+        <button class="btn btn-outline-light btn-sm d-lg-none" id="mobileToggle">
+          <i class="fa-solid fa-bars text-color1"></i>
+        </button>
+        <div class="mb-0"><img loading="lazy" th:src="@{/assets/images/logo.svg}" alt="TestWheel Logo" width="149px"
+            height="42px"></div>
+
+
+        <div class="dropdown d-md-block d-none">
+          <div id="dropdownButton" class="btn-drpdwn text-color1 para-f4 dmsans-semibold p-tb-10 p-lr-16"
+            data-bs-toggle="dropdown">
+            <span id="selectedProject">Test Wheel</span><i class="fa-solid fa-chevron-down ps-3"></i>
+          </div>
+          <div id="projectDropdown" class="dropdown-menu w-320 py-0 custom-dropdown">
+            <!-- JS will populate here -->
+          </div>
+
+        </div>
+
+
+        <script>
+          let showAll = sessionStorage.getItem('showAll') === 'true';
+          let projectsData = [];
+          let selectedProjectId = null;
+          let selectedProject = null;
+          //let selectedProjectId = sessionStorage.getItem('SelectedProjectId');
+
+          function loadProjects() {
+            /*
+             * Step 1: Fetch the session-stored selected project,
+             * then load all projects.
+             */
+            fetch('/projects/selected')
+              .then(response => response.json())
+              .then(sessionData => {
+                selectedProjectId = sessionData.selectedProjectId || null;
+                selectedProjectName = sessionData.selectedProjectName || null;
+                return fetch('/projects');
+              })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Failed to load projects');
+                }
+                return response.json();
+              })
+              .then(data => {
+
+                projectsData = data;
+
+                // Determine selected project based on stored ID
+                if (selectedProjectId != null) {
+                  selectedProject = projectsData.find(p => p.projectId == selectedProjectId);
+                }
+
+                // Fallback to first project if none selected
+                if (!selectedProject && projectsData.length > 0) {
+                  selectedProject = projectsData[0];
+                }
+
+                // Ensure selectedProjectId has a value for later use
+                if (selectedProject && !selectedProjectId) {
+                  selectedProjectId = selectedProject.projectId;
+                }
+
+                /*
+                 * Set project name in header
+                 */
+                if (selectedProject) {
+                  document.getElementById(
+                    'selectedProject'
+                  ).textContent =
+                    selectedProject.projectName;
+                }
+
+                renderProjects();
+              })
+              .catch(error => {
+                console.error("Error loading projects:", error);
+              });
+          }
+
+
+          function renderProjects() {
+
+            const dropdown = document.getElementById('projectDropdown');
+
+            if (!dropdown) {
+              return;
+            }
+
+            /*
+             * Clear existing content
+             */
+            dropdown.innerHTML = '';
+
+
+            /*
+             * HEADER
+             */
+            const header = document.createElement('div');
+
+            header.className =
+              'd-flex justify-content-between pe-4 ps-2 brdr-btm-1 py-3';
+
+            header.innerHTML = `
+                <div class="col-sm-6">
+                    <p class="para-f3 dmsans-semibold px-2 text-color1 mb-0">
+                        Your Projects
+                    </p>
+                </div>
+
+                <div class="col-sm-6 text-end">
+                    <div class="para-f3 text-color3 dmsans-semibold">
+                        <a href="#"
+                           id="toggleProjects">
+                            ${showAll ? 'Show Less' : 'View All'}
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            dropdown.appendChild(header);
+            // Ensure dropdown is visible (Bootstrap expects 'show' class)
+            // dropdown.classList.add('show');
+
+
+            /*
+             * PROJECT LIST
+             */
+            const projectList = document.createElement('div');
+
+            projectList.id = 'projectList';
+            projectList.className = 'project-list';
+
+
+            /*
+             * Show only 4 projects initially.
+             * Show all projects after View All.
+             */
+            const projectsToShow = showAll
+              ? projectsData
+              : projectsData.slice(0, 4);
+
+
+            projectsToShow.forEach(project => {
+
+              const projectWrapper = document.createElement('div');
+
+              projectWrapper.className = 'px-2 p-t-16 p-b-8';
+
+
+              projectWrapper.innerHTML = `
+                    <a href="#"
+                       class="dropdown-item d-flex justify-content-between project-item"
+                       data-project-id="${project.projectId}"
+                       data-project-name="${encodeURIComponent(project.projectName)}"
+                       data-project="${encodeURIComponent(project.projectName)}">
+
+                        <span>
+                            <p class="dmsans-semibold text-color1 mb-0">
+                                ${project.projectName}
+                            </p>
+
+                            <p class="text-color4 para-f4 mb-0">
+                                Created By ${project.createdBy ? project.createdBy.username || project.createdBy.firstName || '' : ''}
+                            </p>
+                        </span>
+
+                        <span class="icon-slot"></span>
+
+                    </a>
+                `;
+
+
+              projectList.appendChild(projectWrapper);
+            });
+
+
+            dropdown.appendChild(projectList);
+            // Ensure dropdown remains visible after adding project list
+            //dropdown.classList.add('show');
+
+
+            /*
+             * FOOTER
+             */
+            const footer = document.createElement('div');
+
+            footer.className =
+              'px-2 p-t-12 p-b-24 project-footer';
+
+            footer.innerHTML = `
+                <a class="btn btn-create p-tb-12 p-lr-16
+                          text-white d-md-block d-none button-f2"
+                   href="/createproject">
+
+                    <img src="/assets/images/create-test-icon.svg"
+                         alt="Icon"
+                         class="pe-2">
+
+                    Create Project
+                </a>
+            `;
+
+            dropdown.appendChild(footer);
+            // Keep dropdown shown after footer added
+            //dropdown.classList.add('show');
+
+
+            /*
+             * VIEW ALL / SHOW LESS
+             */
+            const toggleButton =
+              document.getElementById('toggleProjects');
+
+
+            if (toggleButton) {
+
+              toggleButton.addEventListener('click', function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                /*
+                 * Toggle state
+                 */
+                showAll = !showAll;
+                sessionStorage.setItem('showAll', showAll);
+
+
+                /*
+                 * Re-render dropdown contents.
+                 *
+                 * IMPORTANT:
+                 * We DO NOT call Bootstrap hide().
+                 *
+                 * This keeps the dropdown open.
+                 */
+                renderProjects();
+
+              });
+            }
+
+
+            /*
+             * PROJECT SELECTION
+             */
+            const projectItems =
+              document.querySelectorAll('.project-item');
+
+
+            projectItems.forEach(item => {
+
+              item.addEventListener('click', function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+
+                /*
+                 * Get selected project ID
+                 */
+                const projectId =
+                  this.getAttribute('data-project-id');
+
+                /*
+                 * Get project name
+                 */
+                const projectName =
+                  decodeURIComponent(
+                    this.getAttribute('data-project-name')
+                  );
+
+
+                /*
+                 * Update button header
+                 */
+                document.getElementById(
+                  'selectedProject'
+                ).textContent = projectName;
+                /*
+                 * Update button header
+                 */
+                // document.getElementById(
+                //     'selectedProjectid'
+                // ).textContent = projectId;
+
+
+                /*
+                 * Save project ID + name in Java Session working fine
+                 */
+                // Send selected project to server with CSRF protection
+                const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+                fetch('/projects/select', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    [csrfHeader]: csrfToken
+                  },
+
+                  body:
+                    'projectId=' +
+                    encodeURIComponent(projectId) +
+                    '&projectName=' +
+                    encodeURIComponent(projectName)
+
+                })
+                  .then(response => {
+
+                    if (!response.ok) {
+                      throw new Error(
+                        'Failed to save selected project'
+                      );
+                    }
+
+                    return response.text();
+
+                  })
+                  .then(data => {
+
+                    selectedProjectId = projectId;
+                    sessionStorage.setItem('selectedProjectId', projectId);
+
+                  })
+                  .catch(error => {
+
+                    console.error(
+                      'Error saving selected project:',
+                      error
+                    );
+
+                  });
+
+
+
+                /*
+                 * Remove all ticks
+                 */
+                document
+                  .querySelectorAll('.icon-slot')
+                  .forEach(slot => {
+                    slot.innerHTML = '';
+                  });
+
+
+                /*
+                 * Add tick to selected project
+                 */
+                const iconSlot =
+                  this.querySelector('.icon-slot');
+
+
+                if (iconSlot) {
+                  iconSlot.innerHTML =
+                    '<i class="fa-solid fa-check text-success"></i>';
+                }
+
+
+                /*
+                 * Close Bootstrap dropdown
+                 */
+                const dropdownButton =
+                  document.getElementById('dropdownButton');
+
+
+                const bsDropdown =
+                  bootstrap.Dropdown.getOrCreateInstance(
+                    dropdownButton
+                  );
+
+
+                bsDropdown.hide();
+
+              });
+
+            });
+
+
+            // Restore selected project tick based on selectedProjectId
+            projectItems.forEach(item => {
+              const itemProjectId = item.getAttribute('data-project-id');
+              // const projectName = decodeURIComponent(item.getAttribute('data-project'));
+              if (String(itemProjectId) === String(selectedProjectId)) {
+                const iconSlot = item.querySelector('.icon-slot');
+                if (iconSlot) {
+                  iconSlot.innerHTML = '<i class="fa-solid fa-check text-success"></i>';
+                }
+              }
+            });
+
+          }
+
+
+          /*
+           * Load projects once page is ready
+           */
+          document.addEventListener(
+            'DOMContentLoaded',
+            function () {
+              loadProjects();
+            }
+          );
+        </script>
+
+
+      </div>
+
+      <div class="d-flex align-items-center gap-4">
+        <a class="btn btn-create p-tb-12 p-lr-16 text-white d-md-block d-none button-f2"
+          th:href="@{/create-testcase}"><img th:src="@{/assets/images/create-test-icon.svg}" alt="Icon" class="pe-2" />
+          Create
+          Test</a>
+
+        <div class="dropdown">
+          <!-- Bell icon trigger -->
+          <div class="ps-2 ps-md-0 py-2 text-color1 notification" data-bs-toggle="dropdown"
+            onclick="loadNotifications()">
+            <img th:src="@{/assets/images/bell-icon.svg}" alt="icon" />
+            <span class="badge-dot"></span>
+          </div>
+
+          <!-- Dropdown menu -->
+          <div class="dropdown-menu py-0 custom-dropdown notification-dropdown" id="notificationDropdown">
+
+            <!-- Notifications will be injected here -->
+          </div>
+        </div>
+
+
+
+        <!-- authenticated user details -->
+
+        <div class="dropdown">
+
+          <!-- Only show login success alert -->
+
+
+          <!-- <img src="assets/images/profile-img.svg" class="rounded-circle cursor-pointer" > -->
+          <div class="profile-avatar" data-bs-toggle="dropdown">
+            <span th:text="${firstLetter}"></span>
+          </div>
+          <div class="dropdown-menu dropdown-menu-end w-320 pb-0 custom-dropdown">
+            <div class="d-flex brdr-btm-1 p-3">
+              <div class="col-auto">
+                <div class="profile-avatar">
+                  <span th:text="${firstLetter}"></span>
+                </div>
+              </div>
+              <div class="col-11">
+
+                <p class="para-f4 dmsans-semibold px-3 text-color1" sec:authentication="name">u</p>
+                <p sec:authorize="isAuthenticated()"></p>
+                <!--                <p sec:authorize="isAnonymous()"></p>-->
+                <p class="para-f4 px-3 text-color6" th:text="${currentUser.firstName}"></p>
+                <span th:text="${firstName}"></span>
+              </div>
+            </div>
+            <ul>
+              <li class="pb-2 mt-3 px-2"><a class="dropdown-item dmsans-semibold text-color1" href="#"><img
+                    th:src="@{/assets/images/profile-icon.svg}" alt="View Profile" class="pe-3" />View Profile</a></li>
+              <li class="py-2 px-2"><a class="dropdown-item dmsans-semibold text-color1" href="#"><img
+                    th:src="@{/assets/images/setting-icon.svg}" alt="Account Settings" class="pe-3" />Account
+                  Settings</a></li>
+              <li class="py-2 px-2"><a class="dropdown-item dmsans-semibold text-color1" href="#"><img
+                    th:src="@{/assets/images/billing-icon.svg}" alt="Billing & Plans" class="pe-3" />Billing & Plans</a>
+              </li>
+              <li class="py-2 mb-3 px-2"><a class="dropdown-item dmsans-semibold text-color1" href="#"><img
+                    th:src="@{/assets/images/help-support-icon.svg}" alt="Help & Support" class="pe-3" />Help &
+                  Support</a>
+              </li>
+
+              <li class="brdr-top-1 py-3 px-2">
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                  <button type="submit" class="dropdown-item text-color8 dmsans-semibold">
+                    <img th:src="@{/assets/images/logout-icon.svg}" alt="Sign Out" class="pe-3" />
+                    Sign Out
+                  </button>
+                </form>
+              </li>
+
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- SIDEBAR -->
+    <div class="sidebar pt-2" id="sidebar">
+      <div class="toggle-btn d-none d-lg-block text-color1 mt-3" id="toggleBtn">
+        <!-- <i class="fa-solid fa-chevron-left"></i> -->
+        <i class="fa-solid fa-angles-left"></i>
+      </div>
+      <div class="d-md-none p-3 border-bottom border-secondary">
+        <!-- <button class="btn btn-create px-4 py-2 text-white w-100 mb-2">
+    <i class="fa-solid fa-plus pe-2"></i> Create Test
+  </button> -->
+        <a class="btn btn-create p-tb-12 p-lr-16 text-white button-f2 w-100 mb-2" th:href="@{/create-testcase}"><img
+            th:src="@{/assets/images/create-test-icon.svg}" alt="Icon" class="pe-2" /> Create Test</a>
+        <div class="dropdown w-100">
+          <div class="btn-drpdwn text-color1 para-f4 dmsans-semibold p-tb-10 p-lr-16 project-selector"
+            data-bs-toggle="dropdown">
+            TestWheel<i class="fa-solid fa-chevron-down ps-3"></i>
+          </div>
+          <div class="dropdown-menu w-100 custom-dropdown">
+            <div class="d-flex justify-content-between px-4 brdr-btm-1 py-2">
+              <div class="col-sm-6 align-self-center">
+                <p class="para-f3 dmsans-semibold px-2 text-color1">Your Projects</p>
+              </div>
+              <div class="col-sm-6 text-end">
+                <div class="para-f3 text-color3 dmsans-semibold"><a href="">View All</a></div>
+              </div>
+            </div>
+            <div class="dropdown-scroll overflow-y-auto">
+              <ul>
+                <li class="px-2 p-t-16 p-b-8">
+                  <a class="dropdown-item d-flex justify-content-between" th:href="@{/testwheel}">
+                    <span>
+                      <p class="dmsans-semibold text-color1">TestWheel</p>
+                      <p class="text-color4 para-f4">Created by Prakash</p>
+                    </span>
+                    <span><img th:src="@{/assets/images/project-check-icon.svg}" alt="icon"></span></a>
+                </li>
+                <li class="px-2 p-t-8 p-b-8"><a class="dropdown-item dmsans-semibold text-color1" href="#"><span>
+                      <p class="dmsans-semibold text-color1">E-commerce Suite</p>
+                      <p class="text-color4 para-f4">Created by Prakash</p>
+                    </span></a></li>
+                <li class="px-2 p-t-8 p-b-8"><a class="dropdown-item dmsans-semibold text-color1" href="#"><span>
+                      <p class="dmsans-semibold text-color1">API test</p>
+                      <p class="text-color4 para-f4">Created by Prakash</p>
+                    </span></a></li>
+
+              </ul>
+            </div>
+            <div class="py-3 px-sm-2"><a class="btn btn-create p-tb-12 p-lr-16 text-white button-f2"
+                data-bs-toggle="modal" data-bs-target="#createProject" th:href="@{/createproject}"><img
+                  th:src="@{/assets/images/create-test-icon.svg}" alt="Icon" class="pe-2">Create Project</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="px-3 sidebar-menu">
+        <ul class="menu">
+          <!-- <div class="m-t-36 mb-1"><p class="text-color5 sidebar-head para-f4 dmsans-semibold">Home</p></div> -->
+          <li class="m-t-36">
+            <a th:href="@{/dashboard}" class="active"><span class="d-flex">
+                <img loading="lazy" th:src="@{assets/images/dashboard-icon.svg}" alt="Dashboard"
+                  class="p-r-12 image-default">
+                <img loading="lazy" th:src="@{assets/images/dashboard-icon-active.svg}" alt="Dashboard"
+                  class="p-r-12 image-active">
+                <span class="menu-text para-f3 align-self-center">Dashboard</span></span></a>
+          </li>
+          <li class="menu-item m-t-16">
+            <a th:href="@{/create-testcase}" class="menu-link"><span class="d-flex">
+                <img loading="lazy" th:src="@{/assets/images/all-tests-icon.svg}" alt="All Tests"
+                  class="p-r-12 image-default">
+                <img loading="lazy" th:src="@{/assets/images/all-tests-icon-active.svg}" alt="All Tests"
+                  class="p-r-12 image-active">
+                <span class="menu-text para-f3 align-self-center">All Tests</span></span><i
+                class="fa-solid fa-chevron-down drpdwn-icon menu-text"></i></a>
+            <ul class="submenu">
+              <li><a th:href="@{/create-testcase}" class="menu-text p-t-12 pb-0 para-f3">API Testing</a></li>
+              <li><a th:href="@{/create-testcase}" class="menu-text p-t-12 pb-0 para-f3">Mobile Testing</a></li>
+              <li><a th:href="@{/create-testcase}" class="menu-text p-t-12 pb-0 para-f3">Web Testing</a></li>
+            </ul>
+          </li>
+          <!-- <div class="m-t-16 mb-1"><p class="text-color5 sidebar-head para-f4 dmsans-semibold">Testing</p></div> -->
+
+          <li class="m-t-16">
+            <a th:href="@{/create-testcase}"><span class="d-flex">
+                <img loading="lazy" th:src="@{/assets/images/create-tests-icon.svg}" alt="Create Tests"
+                  class="p-r-12 image-default">
+                <img loading="lazy" th:src="@{/assets/images/create-tests-icon-active.svg}" alt="Create Tests"
+                  class="p-r-12 image-active">
+                <span class="menu-text para-f3 align-self-center">Create Test</span></span></a>
+          </li>
+          <li class="m-t-16">
+            <a th:href="@{/testlist}"><span class="d-flex">
+                <img loading="lazy" th:src="@{/assets/images/test-list-icon.svg}" alt="Test List"
+                  class="p-r-12 image-default">
+                <img loading="lazy" th:src="@{/assets/images/test-list-icon-active.svg}" alt="Test List"
+                  class="p-r-12 image-active">
+                <span class="menu-text para-f3 align-self-center">Test List</span></span></a>
+          </li>
+          <!-- <div class="m-t-16 mb-1"><p class="text-color5 sidebar-head para-f4 dmsans-semibold">Reports</p></div> -->
+          <li class="m-t-16">
+            <a href="#"><span class="d-flex">
+                <img loading="lazy" th:src="@{/assets/images/test-report-icon.svg}" alt="Test Reports"
+                  class="p-r-12 image-default">
+                <img loading="lazy" th:src="@{/assets/images/test-report-icon-active.svg}" alt="Test Reports"
+                  class="p-r-12 image-active">
+                <span class="menu-text para-f3 align-self-center">Test Reports</span></span></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- BACKDROP -->
+    <div id="backdrop"></div>
+    <!-- CONTENT -->
+    <div class="content maincontent" id="content">
+      <div class="container-fluid">
+        <div class="row px-md-3 pb-0 top-row">
+          <p class="head-h4 dmsans-semibold text-color1">Dashboard Overview</p>
+          <p class="para-f3 text-color4 m-t-8">Welcome back. Start by configuring your first automated test environment.
+          </p>
+        </div>
+        <div class="content-center-tb m-t-36">
+          <div class="container-fluid px-0">
+            <div class="d-flex justify-content-center">
+              <div class="col-md-10 col-xxl-7">
+                <div class="text-center"><img loading="lazy" th:src="@{/assets/images/workspace.svg}" alt="Testing">
+                </div>
+
+                <p class="head-h3 dmsans-semibold px-3 text-color1 text-center m-t-16">Your workspace is ready for
+                  testing</p>
+                <p class="para-f3 text-color4 m-t-8 text-center">Connect your application and start building test
+                  scenarios. You can choose between<br class="d-none d-xxl-block"> manual building, AI-assisted
+                  generation, or importing existing scripts.</p>
+                <div class="d-flex m-t-36 px-3 justify-content-center">
+                  <div class="col-12 col-md-6 col-xl-5 d-flex justify-content-center">
+                    <a class="btn btn-create px-lg-4 p-tb-14 text-white button-f1 w-100"
+                      th:href="@{/create-testcase}">Create Your First Test</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function loadNotifications() {
+      fetch('/notifications')
+        .then(response => response.json())
+        .then(data => {
+          let dropdown = document.getElementById('notificationDropdown');
+          dropdown.innerHTML = ""; // clear old items
+
+          // Header
+          dropdown.innerHTML += `
+                <div class="d-flex justify-content-between px-4 brdr-btm-1 py-3">
+                  <div class="col-sm-6">
+                    <p class="para-f3 dmsans-semibold text-color1">
+                      Notifications <span class="badge badge-circle">${data.length}</span>
+                    </p>
+                  </div>
+                  <div class="col-sm-6 text-end">
+                    <p class="para-f3 text-color3 dmsans-semibold"><a href="#">Mark all as read</a></p>
+                  </div>
+                </div>`;
+
+          // Loop notifications
+          data.forEach(note => {
+            dropdown.innerHTML += `
+                    <div class="brdr-btm-1 d-flex bg-color2 p-3">
+                      <div class="col-auto"><img src="/assets/images/test-execution.svg" alt="Icon" /></div>
+                      <div class="col-11">
+                        <p class="para-f4 dmsans-semibold px-3 text-color1">${note.title}
+                          <span class="dot bg-color3 ms-1 mt-2"></span>
+                        </p>
+                        <p class="para-f4 px-3 text-color6">${note.message}</p>
+                        <p class="para-f4 px-3 text-color6">${note.timeAgo}</p>
+                      </div>
+                    </div>`;
+          });
+
+          // Footer
+          dropdown.innerHTML += `
+                <div class="py-3 px-3">
+                  <a class="dropdown-item text-color3 dmsans-semibold text-center" href="/notificationsall">View all notifications</a>
+                </div>`;
+
+          // update badge count
+          document.getElementById('notificationBadge').textContent = data.length;
+        });
+    }
+  </script>
+
+
+  <!--     Replace Button Text + Tick-->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const button = document.getElementById("dropdownButton");
+      const items = document.querySelectorAll(".project-item");
+
+      items.forEach(item => {
+        item.addEventListener("click", function (e) {
+          e.preventDefault();
+
+          // Update button text with selected project name
+          const projectName = this.getAttribute("data-name");
+          button.innerHTML = projectName + '<i class="fa-solid fa-chevron-down ps-3"></i>';
+
+          // Remove tick from all items
+          document.querySelectorAll(".icon-slot").forEach(slot => slot.innerHTML = "");
+
+          // Add tick to selected item
+          this.querySelector(".icon-slot").innerHTML = '<i class="fa-solid fa-check text-success"></i>';
+        });
+      });
+    });
+  </script>
+
+
+
+
+  <script th:src="@{/assets/js/tw-scripts.js}"></script>
+  <script th:src="@{/assets/js/jquery.min.js}"></script>
+  <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>

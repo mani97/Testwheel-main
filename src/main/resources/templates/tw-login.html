@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>TestWheel - Login</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Correct Thymeleaf resource linking -->
+    <link rel="icon" type="image/png" th:href="@{/favicon.png}">
+    <link th:href="@{/assets/css/common-styles.css}" rel="stylesheet">
+    <link th:href="@{/assets/css/login-styles.css}" rel="stylesheet">
+    <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/assets/fontawesome/css/all.min.css}" rel="stylesheet">
+
+    <script th:src="@{/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Header -->
+        <div class="fixed-top py-0 px-3 px-sm-4 box-shadow bg-white">
+            <nav class="navbar navbar-expand-lg justify-content-between py-0">
+                <div class="container-fluid container-xxl justify-content-between px-0 p-tb-11">
+                    <a class="navbar-brand col-auto me-0 py-0" th:href="@{/signup}">
+                        <!-- External image can be used directly -->
+                        <img th:src="@{https://d1dn83zl6bhqp.cloudfront.net/images/logo.webp}" alt="TestWheel Logo"
+                            height="56px">
+                    </a>
+                </div>
+            </nav>
+        </div>
+        <!-- end of header -->
+
+        <!-- body content -->
+        <div class="body-content">
+            <section class="p-t-16">
+                <div class="container-fluid container-xxl">
+                    <div class="row justify-content-lg-between justify-content-center">
+                        <div
+                            class="col-lg-6 col-xxl-5 text-xl-start align-self-center position-relative order-2 order-lg-1 py-5 py-lg-0">
+                            <img class="mw-100" th:src="@{/assets/images/login-bg.webp}" alt="Login">
+                            <div class="pstn-abslt px-4">
+                                <h1 class="text-white text-center head-h2 m-t-24">
+                                    AI-Powered Test <br class="d-none d-lg-block">Automation Platform
+                                </h1>
+                                <p class="text-white para-p text-center m-t-12">
+                                    Exclusively Designed for Small and Medium <br>Sized Businesses
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5 col-md-8 col-xxl-5 align-self-center order-1 order-lg-2">
+                            <h2 class="text-color1 head-h4 dmsans-bold m-b-32">Log in to Your TestWheel Account</h2>
+
+                            <!-- Correct form binding -->
+                            <form th:action="@{/perform_login}" method="post" th:object="${user}">
+                                <div class="row">
+                                    <div class="col-md-12 m-b-24">
+                                        <label class="form-label label-fnt dmsans-medium">Business email*</label>
+                                        <input type="email" th:field="*{username}" class="form-control input-bg"
+                                            placeholder="ex. email@domain.com">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 m-b-24">
+                                        <label class="form-label label-fnt dmsans-medium">Phone number</label>
+                                        <div class="input-group bg-color1">
+                                            <select class="form-select form-select-bg">
+
+                                                <option th:each="c : ${countries}" th:value="${'+' + c.calling_code}"
+                                                    th:text="${c.country + ' (+' + c.calling_code + ')'}"
+                                                    th:selected="${c.calling_code == '91' or c.calling_code == 91}">
+                                                </option>
+
+                                            </select>
+                                            <span class="align-self-center color-input"> | </span>
+                                            <input type="text" th:field="*{phone}"
+                                                class="form-control input-bg brdr-radius-lft"
+                                                placeholder="Enter phone number">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 m-b-24">
+                                        <label class="form-label label-fnt dmsans-medium">Password*</label>
+                                        <div class="input-group bg-color1">
+                                            <input type="password" id="passwordField" th:field="*{password}"
+                                                class="form-control input-bg" placeholder="Enter Password">
+                                            <i class="fa-solid toggle-password-eye text-color1 fa-eye"
+                                                id="togglePassword"></i>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <script>
+                                    const togglePassword = document.getElementById("togglePassword");
+                                    const passwordField = document.getElementById("passwordField");
+
+                                    togglePassword.addEventListener("click", function () {
+                                        // Switch input type
+                                        const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+                                        passwordField.setAttribute("type", type);
+
+                                        // Toggle eye / eye-slash icon
+                                        this.classList.toggle("fa-eye");
+                                        this.classList.toggle("fa-eye-slash");
+                                    });
+                                </script>
+
+                                <div th:if="${loginError != null or session.loginError != null}" id="loginError"
+                                    style="color: red; font-size: 14px; font-weight: 500; margin-top: 8px;">
+                                    <span th:text="${loginError != null ? loginError : session.loginError}"></span>
+                                </div>
+
+
+                                <div th:if="${session.signupSuccess}" id="signupSuccess" class="alert alert-success">
+                                    <span th:text="${session.signupSuccess}"></span>
+                                </div>
+
+                                <!-- Flash Message -->
+                                <div th:if="${message}" id="flashMessage"
+                                    style="color: rgb(16, 86, 3); font-weight: bold;">
+                                    <span th:text="${message}"></span>
+                                </div>
+
+
+                                <!--Fade out for login error and signup success and flash message-->
+                                <script>
+                                    setTimeout(function () {
+                                        //"flashMessage", email activation
+                                        //loginErr, signin notification
+                                        //
+                                        const ids = ["loginError", "signupSuccess"];
+                                        ids.forEach(function (id) {
+                                            const el = document.getElementById(id);
+                                            if (el) {
+                                                el.style.transition = "opacity 0.5s ease";
+                                                el.style.opacity = "0";
+                                                setTimeout(function () { el.style.display = "none"; }, 500);
+                                            }
+                                        });
+                                    }, 3000);
+                                </script>
+
+
+
+
+
+                                <div class="row">
+                                    <div class="col-md-12 m-b-24">
+                                        <p class="text-color1 dmsans-medium text-end para-p"><a
+                                                th:href="@{/forgot-password-phone}" class="text-color3">I forgot my
+                                                password</a></p>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 m-b-24">
+                                        <button type="submit"
+                                            class="btn btn-blue btn-border-r py-3 px-4 w-100 fs-18 icon-hover">Log
+                                            In</button>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 m-b-24">
+                                        <div class="line">
+                                            <span class="text-color1">or Sign in With</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="row">
+                                    <div class="col-md-12 m-b-24">
+                                        <div class="d-flex justify-content-center">
+                                            <a class="me-3" th:href="@{/oauth2/authorization/google}">
+                                                <img th:src="@{/assets/images/google-img.svg}" alt="Google-Logo">
+                                            </a>
+                                            <a class="ms-2" th:href="@{/oauth2/authorization/github}">
+                                                <img th:src="@{/assets/images/microsoft-img.svg}" alt="Microsoft-Logo">
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <p class="dmsans-medium text-center para-p">
+                                            New to TestWheel? <a th:href="@{/signup}" class="text-color3">Join free
+                                                today</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- end of layout -->
+</body>
+
+</html>
+
+<script>
+    setTimeout(() => {
+        const alertBox = document.querySelector('.alert');
+        if (alertBox) {
+            alertBox.style.transition = "opacity 0.5s";
+            alertBox.style.opacity = "0";
+            setTimeout(() => alertBox.remove(), 500);
+        }
+    }, 3000); // 3 seconds
+</script>

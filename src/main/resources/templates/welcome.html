@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <title>
+   TestWheel - Welcome 
+  </title>
+  <meta charset="utf-8">
+
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link th:href="@{assets/css/common-styles.css}" rel="stylesheet">
+  <link th:href="@{assets/css/login-styles.css}" rel="stylesheet">
+  <link th:href="@{assets/css/after-login-styles.css}" rel="stylesheet">
+  <link th:href="@{assets/css/bootstrap.min.css}" rel="stylesheet">
+  <link th:href="@{assets/fontawesome/css/all.min.css}" rel="stylesheet">
+</head>
+<body>
+<div class="layout">
+  <!-- Header -->
+    <div class="fixed-top py-0 px-3 px-sm-4 box-shadow bg-white navbar-wrapper">
+      <nav class="navbar navbar-expand-lg py-0">
+<div class="container-fluid container-xxl px-0 p-t-24">
+        <a class="navbar-brand col-auto me-0 py-0" th:href="@{/}">
+            <img th:src="@{assets/images/tw-logo.svg}" alt="TestWheel Logo" height="60px">
+        </a>  
+          </div>
+      </nav>    
+    </div>
+  <!-- end of header -->
+  <!-- body content -->
+  <div class="body-content">
+ <section class="main-section container-fluid container-xxl">
+  <!-- <div class="container-fluid container-xxl"> -->
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+       <h1 class="text-center text-color1 head-h1 dmsans-bold">Welcome to TestWheel</h1>
+       <p class="text-center para-f3 text-color4 dmsans-regular m-t-8">Let's get you set up and ready to automate your testing workflow</p>
+    </div>
+    </div>
+       <div class="step-wrapper content-area">
+          <div class="step active">
+            <div class="row justify-content-center">
+              <div class="col-md-6 col-xl-5 align-self-center">
+        <h3 class="head-h3 dmsans-semibold text-color1">What is your role?</h3>
+      </div>
+       <div class="col-md-6 col-xl-5 pt-4 pt-md-0">
+        <div class="option-group">
+        <div class="option brdr-r-16 role-option" data-value="Software Developer" >
+          <div class="row align-items-center">
+            <div class="col-lg-4"><img th:src="@{assets/images/software-developer.svg}" alt="Software Developer"></div>
+            <div class="col-lg-8">
+              <p class="text-lg-start para-f1 dmsans-semibold text-color1">Software Developer</p>
+              <p class="text-lg-start para-f4 dmsans-regular m-t-8 text-color4">Writing code and automated unit tests.</p>
+            </div>
+          </div>
+        </div>
+        <div class="option brdr-r-16 role-option" data-value="QA Engineer / Tester" >
+          <div class="row align-items-center">
+            <div class="col-lg-4"><img th:src="@{assets/images/qa-engineer.svg}" alt="QA Engineer / Tester"></div>
+            <div class="col-lg-8">
+              <p class="text-lg-start para-f1 dmsans-semibold text-color1">QA Engineer / Tester</p>
+              <p class="text-lg-start para-f4 dmsans-regular m-t-8 text-color4">Ensuring product quality and reliability.</p>
+            </div>
+          </div>
+        </div>
+        <div class="option brdr-r-16 role-option" data-value="Product Lead / Manager" >
+          <div class="row align-items-center">
+            <div class="col-lg-4"><img th:src="@{assets/images/product-lead.svg}" alt="Product Lead / Manager"></div>
+            <div class="col-lg-8">
+              <p class="text-lg-start para-f1 dmsans-semibold text-color1">Product Lead / Manager</p>
+              <p class="text-lg-start para-f4 dmsans-regular m-t-8 text-color4">Overseeing test coverage and team velocity.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+            </div>
+    </div>
+    <div class="step">
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-xl-5 align-self-center"><h3 class="head-h3 dmsans-semibold text-color1">Organization Name</h3></div>
+        <div class="col-md-6 col-xl-5 pt-4 pt-md-0">
+            <label for="productName"></label><input type="text" id="productName" class="form-control form-input" placeholder="Enter Your Company or Team Name">
+      <div id="orgError" class="text-danger d-none"> Organization name must be 3–50 character etc, - only.</div>
+            <!-- Inline CSS -->
+            <style>
+                .input-error {
+                    border: 2px solid red;
+                }
+            </style>
+        </div>
+    </div>
+   <div class="row justify-content-center">
+      <div class="offset-4 col-md-8 col-xxl-6 pt-4 pt-md-0">
+    <div class="row m-t-36 justify-content-end">
+<div class="offset-5 col-md-6 col-5 col-xl-5 col-xxl-4 m-t-24 mt-md-0">
+  <button class="btn btn-create dmsans-semibold w-100 px-lg-4 p-t-12 p-b-12 text-white icon-hover" id="continueBtn">Continue <i class="fa-solid fa-arrow-right ps-1"></i></button></div>
+</div>
+  </div>
+</div>
+</div>
+  <div class="step">
+      <div class="row justify-content-center">
+        <div class="col-md-3 align-self-center"><h3 class="head-h3 dmsans-semibold text-color1 text-xl-center">Team Size</h3></div>
+        <div class="col-md-8 col-lg-7 col-xxl-6 pt-4 pt-md-0">
+         <!--  <div class="option-group m-t-16">
+        <div class="option brdr-r-16"> -->
+          <div class="row justify-content-md-end">
+            <div class="col-sm-5 col-md-6 col-lg-5 col-xxl-4 option-group">
+              <div class="row option brdr-r-16 justify-content-center team-option" data-value="1-8">
+            <div class="col-3"><img th:src="@{assets/images/team-size.svg}" alt="Team Size"></div>
+            <div class="col-6 align-self-center">
+              <p class="text-lg-center para-f1 dmsans-semibold text-color1">1-8</p>
+            </div>
+          </div>
+            </div>
+            <div class="col-sm-5 col-md-6 col-lg-5 col-xxl-4 option-group">
+              <div class="row option brdr-r-16 justify-content-center team-option" data-value="8-20">
+            <div class="col-3"><img th:src="@{assets/images/team-size-1.svg}" alt="Team Size"></div>
+            <div class="col-6 align-self-center">
+              <p class="text-lg-center para-f1 dmsans-semibold text-color1">8–20</p>
+            </div>
+          </div>
+            </div>
+          </div>
+          <div class="row justify-content-md-end">
+            <div class="col-sm-5 col-md-6 col-lg-5 col-xxl-4 option-group">
+              <div class="row option brdr-r-16 justify-content-center team-option" data-value="20-50">
+            <div class="col-3"><img th:src="@{assets/images/team-size-2.svg}" alt="Team Size"></div>
+            <div class="col-6 align-self-center">
+              <p class="text-lg-center para-f1 dmsans-semibold text-color1">20–50</p>
+            </div>
+          </div>
+            </div>
+            <div class="col-sm-5 col-md-6 col-lg-5 col-xxl-4 option-group">
+              <div class="row option brdr-r-16 justify-content-center team-option" data-value="50+">
+            <div class="col-3"><img th:src="@{assets/images/team-size-3.svg}" alt="Team Size"></div>
+            <div class="col-6 align-self-center">
+              <p class="text-lg-center para-f1 dmsans-semibold text-color1">50+</p>
+            </div>
+          </div>
+            </div>
+          </div>
+       <!--  </div>
+      </div> -->
+    </div>
+    </div>
+  </div>
+  <div class="step pe-xl-5">
+      <div class="row justify-content-center">
+        <div class="col-md-4 align-self-center">
+          <h3 class="head-h3 dmsans-semibold text-color1">Which platform would you like to use in TestWheel?</h3>
+          <p class="text-start para-f3 text-color4 dmsans-regular m-t-8">You can choose more than one platform.</p>
+        </div>
+        <div class="col-md-8 col-xxl-6 pt-4 pt-md-0">
+        <div class="row justify-content-md-end">
+            <div class="col-sm-5 col-md-6 col-lg-4 option-group">
+              <div class="row option brdr-r-16 justify-content-center platform-option" data-value="Web">
+            <div class="col-3"><img th:src="@{assets/images/web.svg}" alt="Web"></div>
+            <div class="col-6 align-self-center">
+              <p class="text-lg-center para-f1 dmsans-semibold text-color1">Web</p>
+            </div>
+          </div>
+            </div>
+            <div class="col-sm-5 col-md-6 col-lg-4 option-group">
+              <div class="row option brdr-r-16 justify-content-center platform-option" data-value="Mobile">
+            <div class="col-3"><img th:src="@{assets/images/mobile.svg}" alt="Mobile"></div>
+            <div class="col-6 align-self-center">
+              <p class="text-lg-center para-f1 dmsans-semibold text-color1">Mobile</p>
+            </div>
+          </div>
+            </div>
+          </div>
+          <div class="row justify-content-md-end">
+            <div class="col-sm-5 col-md-6 col-lg-4 option-group">
+              <div class="row option brdr-r-16 justify-content-center platform-option" data-value="API">
+            <div class="col-3"><img th:src="@{assets/images/api.svg}" alt="API"></div>
+            <div class="col-6 align-self-center">
+              <p class="text-lg-center para-f1 dmsans-semibold text-color1">API</p>
+            </div>
+          </div>
+            </div>
+            <div class="col-sm-5 col-md-6 col-lg-4 option-group">
+              <div class="row option brdr-r-16 justify-content-center platform-option" data-value="Desktop">
+            <div class="col-3"><img th:src="@{assets/images/desktop.svg}" alt="Desktop"></div>
+            <div class="col-6 align-self-center">
+              <p class="text-lg-center para-f1 dmsans-semibold text-color1">Desktop</p>
+            </div>
+          </div>
+            </div>
+          </div>
+    </div>
+    </div>
+ <div class="row justify-content-center">
+      <div class="offset-4 col-md-8 col-xxl-6 pt-4 pt-md-0">
+    <div class="row m-t-36 justify-content-end">
+<div class="col-md-6 col-5 col-xl-5 col-xxl-4 m-t-24 mt-md-0">
+  <button class="btn btn-create dmsans-semibold w-100 px-lg-4 p-t-12 p-b-12 text-white icon-hover" id="continueBt" >Continue <i class="fa-solid fa-arrow-right ps-1"></i></button></div>
+</div>
+</div>
+</div>
+  </div>
+    </div>
+    <div class="row justify-content-center progress-wrapper">
+  <div class="col-md-12 progress-container">
+      <div class="progress-line active unlocked" data-step="0"></div>
+      <div class="progress-line" data-step="1"></div>
+      <div class="progress-line" data-step="2"></div>
+      <div class="progress-line" data-step="3"></div>
+    </div>
+    <p class="para-f1 dmsans-semibold text-center p-t-8">Let’s set up your testing workspace</p>
+    </div>
+  <!-- </div> -->
+ </section>
+</div>
+</div>
+  <script th:src="@{assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{assets/js/jquery.min.js}"></script>
+  <script th:src="@{assets/js/tw-scripts.js}"></script>
+
+  <script type="text/javascript">
+    const steps = document.querySelectorAll(".step");
+const progress = document.querySelectorAll(".progress-line");
+
+let currentStep = 0;
+let unlockedStep = 0;
+
+function showStep(index) {
+  if (index < 0 || index >= steps.length) return;
+  if (index > unlockedStep) return;
+
+  const current = steps[currentStep];
+  const next = steps[index];
+  const isForward = index > currentStep;
+
+  steps.forEach(step => {
+    step.classList.remove("show", "fade-up-start", "fade-down-start");
+  });
+
+  current.classList.remove("show");
+
+  setTimeout(() => {
+    current.classList.remove("active");
+
+    currentStep = index;
+
+    if (isForward) {
+      next.classList.add("fade-up-start");
+    } else {
+      next.classList.add("fade-down-start");
+    }
+
+    next.classList.add("active");
+
+    void next.offsetWidth;
+
+    next.classList.add("show");
+
+    progress.forEach((bar, i) => {
+      bar.classList.toggle("active", i <= currentStep);
+    });
+  }, 200);
+}
+
+document.getElementById("continueBtn").addEventListener("click", () => {
+  unlockedStep = 2; 
+  //showStep(2);
+});
+
+// INIT
+window.addEventListener("load", () => {
+  const first = document.querySelector(".step.active");
+
+  first.classList.add("fade-up-start");
+
+  setTimeout(() => {
+    first.classList.add("show");
+  }, 50);
+
+  progress.forEach((bar, i) => {
+    bar.classList.toggle("active", i === 0);
+  });
+});
+/* ===== OPTION CLICK ===== */
+document.querySelectorAll(".option").forEach(option => {
+  option.addEventListener("click", () => {
+
+    const group = option.parentElement;
+
+    group.querySelectorAll(".option").forEach(opt =>
+      opt.classList.remove("active")
+    );
+
+    option.classList.add("active");
+
+    checkAndMove();
+  });
+});
+
+/* ===== CHECK STEP COMPLETE ===== */
+function checkAndMove() {
+  const groups = steps[currentStep].querySelectorAll(".option-group");
+
+  let done = true;
+
+  groups.forEach(group => {
+    if (!group.querySelector(".option.active")) {
+      done = false;
+    }
+  });
+
+  if (done && currentStep < steps.length - 1) {
+
+    unlockedStep = Math.max(unlockedStep, currentStep + 1);
+
+    progress[unlockedStep].classList.add("unlocked");
+
+    setTimeout(() => showStep(currentStep + 1), 250);
+
+  } else if (done && currentStep === steps.length - 1) {
+    document.getElementById("done").classList.remove("d-none");
+  }
+}
+
+/* ===== PROGRESS CLICK ===== */
+progress.forEach((bar, index) => {
+  bar.addEventListener("click", () => {
+    if (index <= unlockedStep) {
+      showStep(index);
+    }
+  });
+});
+  </script>
+
+<script>
+
+    const token = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+    const header = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+
+
+    let wizardData = {
+
+    };
+
+    // role selection
+    document.querySelectorAll(".role-option").forEach(opt => {
+      opt.addEventListener("click", function() {
+        document.querySelectorAll(".role-option").forEach(o => o.classList.remove("selected"));
+        this.classList.add("selected");
+
+        wizardData.role = this.getAttribute("data-value");
+        console.log("Selected role:", wizardData.role);
+      });
+    });
+
+
+    // organization name
+    document.getElementById("continueBtn").addEventListener("click", function(e) {
+      e.preventDefault();
+      const orgInput = document.getElementById("productName");
+    const orgError = document.getElementById("orgError");
+    const orgName = orgInput.value.trim();
+    const regex = /^(?=.*[A-Za-z])[A-Za-z0-9&\-\s]{3,50}$/;
+
+
+      if (!regex.test(orgName)) {
+        orgInput.classList.add("input-error");
+        orgError.classList.remove("d-none");
+
+        //  Stay on current step, do not advance
+        return;
+      }
+
+    // Clear error styling if valid
+    orgInput.classList.remove("input-error");
+    orgError.classList.add("d-none");
+
+      wizardData.organizationName = orgName;
+      console.log("Organization:", wizardData.organizationName);
+unlockedStep = Math.max(unlockedStep, currentStep + 1);
+progress[unlockedStep].classList.add("unlocked");
+showStep(currentStep+1);
+
+    });
+
+    // team size
+    document.querySelectorAll(".team-option").forEach(opt => {
+      opt.addEventListener("click", function() {
+        document.querySelectorAll(".team-option").forEach(o => o.classList.remove("selected"));
+        this.classList.add("selected");
+
+        wizardData.teamSize = this.getAttribute("data-value");
+        console.log("Team size:", wizardData.teamSize);
+
+        // unlock and move to next step immediately
+    unlockedStep = Math.max(unlockedStep, currentStep + 1);
+    progress[unlockedStep].classList.add("unlocked");
+    showStep(currentStep + 1);
+      });
+    });
+
+     // platform
+    document.querySelectorAll(".platform-option").forEach(opt => {
+      opt.addEventListener("click", function() {
+        document.querySelectorAll(".platform-option").forEach(o => o.classList.remove("selected"));
+        this.classList.add("selected");
+
+        wizardData.platform = this.getAttribute("data-value");
+        console.log("platform:", wizardData.platform);
+      });
+    });
+
+    // final submit
+    document.getElementById("continueBt").addEventListener("click", function() {
+      fetch('/saveWizard', {
+        method: 'POST',
+        headers: {
+        [header]:token,
+         'Content-Type': 'application/json' },
+        body: JSON.stringify(wizardData)
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Saved:", data);
+        window.location.href = "/welcome-loading";
+      })
+      .catch(err => console.error("Error:", err));
+    });
+</script>
+
+
+
+
+
+
+
+
+<!-- end of layout -->
+</body>
+</html>

@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>
+        TestWheel - Create TestCase
+    </title>
+
+    <meta charset="utf-8">
+
+
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link rel="icon" type="image/png" th:href="@{/favicon.png}">
+    <link th:href="@{assets/css/common-styles.css}" rel="stylesheet">
+    <link th:href="@{assets/css/login-styles.css}" rel="stylesheet">
+    <link th:href="@{assets/css/after-login-styles.css}" rel="stylesheet">
+    <link th:href="@{assets/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{assets/fontawesome/css/all.min.css}" rel="stylesheet">
+</head>
+
+<body>
+    <!-- HEADER -->
+    <div class="page-wrapper">
+        <div class="header p-t-12 p-b-12">
+            <div class="d-flex align-items-center gap-3 gap-lg-5">
+                <!-- MOBILE BUTTON -->
+                <button class="btn btn-outline-light btn-sm d-lg-none" id="mobileToggle">
+                    <i class="fa-solid fa-bars text-color1"></i>
+                </button>
+                <div class="mb-0"><img loading="lazy" th:src="@{assets/images/logo.svg}" alt="TestWheel Logo"
+                        width="149px" height="42px"></div>
+
+                <div class="dropdown d-md-block d-none">
+                    <div class="btn-drpdwn text-color1 para-f4 dmsans-semibold p-tb-10 p-lr-16"
+                        data-bs-toggle="dropdown">
+                        TestWheel<i class="fa-solid fa-chevron-down ps-3"></i>
+                    </div>
+
+                    <div class="dropdown-menu w-320  py-0 custom-dropdown">
+                        <div class="d-flex justify-content-between pe-4 ps-2 brdr-btm-1 py-3">
+                            <div class="col-sm-6">
+                                <p class="para-f3 dmsans-semibold px-2 text-color1">Your Projects</p>
+                            </div>
+                            <div class="col-sm-6 text-end">
+                                <div class="para-f3 text-color3 dmsans-semibold"><a href="">View All</a></div>
+                            </div>
+                        </div>
+                        <div class="dropdown-scroll overflow-y-auto">
+                            <ul>
+                                <li class="px-2 p-t-16 p-b-8">
+                                    <a class="dropdown-item d-flex justify-content-between" href="#">
+                                        <span>
+                                            <p class="dmsans-semibold text-color1">TestWheel</p>
+                                            <p class="text-color4 para-f4">Created by Prakash</p>
+                                        </span>
+                                        <span>
+                                            <img th:src="@{assets/images/project-check-icon.svg}" alt="icon">
+                                        </span>
+                                    </a>
+                                </li>
+                                <li class="px-2 p-t-8 p-b-8"><a class="dropdown-item dmsans-semibold text-color1"
+                                        th:href="@{/alltest}"><span>
+                                            <p class="dmsans-semibold text-color1">E-commerce Suite</p>
+                                            <p class="text-color4 para-f4">Created by Prakash</p>
+                                        </span></a></li>
+                                <li class="px-2 p-t-8 p-b-8"><a class="dropdown-item dmsans-semibold text-color1"
+                                        th:href="@{/alltest}"><span>
+                                            <p class="dmsans-semibold text-color1">API test</p>
+                                            <p class="text-color4 para-f4">Created by Prakash</p>
+                                        </span></a></li>
+
+                            </ul>
+                        </div>
+                        <div class="px-2 p-t-12 p-b-24"><a
+                                class="btn btn-create p-tb-12 p-lr-16 text-white d-md-block d-none button-f2"
+                                data-bs-toggle="modal" data-bs-target="#newProject"><img
+                                    th:src="@{assets/images/create-test-icon.svg}" alt="Icon" class="pe-2">Create
+                                Project</a></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="d-flex align-items-center gap-4">
+                <a th:href="@{/create-testcase}"
+                    class="btn btn-create p-tb-12 p-lr-16 text-white d-md-block d-none button-f2"><img
+                        th:src="@{/assets/images/create-test-icon.svg}" alt="Icon" class="pe-2" /> Create Test</a>
+
+
+                <div class="dropdown">
+                    <!-- Bell icon trigger -->
+                    <div class="ps-2 ps-md-0 py-2 text-color1 notification" data-bs-toggle="dropdown"
+                        onclick="loadNotifications()">
+                        <!-- <i class="fa-regular fa-bell fs-4"></i> -->
+                        <img th:src="@{/assets/images/bell-icon.svg}" alt="icon" />
+                        <span class="badge-dot"></span>
+                    </div>
+
+                    <div class="dropdown-menu w-420 py-0 custom-dropdown" id="notificationDropdown">
+                        <!-- Notifications will be injected here -->
+                    </div>
+                </div>
+
+
+                <!-- authenticated user details -->
+
+                <div class="dropdown">
+                    <!-- <img src="assets/images/profile-img.svg" class="rounded-circle cursor-pointer" > -->
+                    <div class="profile-avatar" data-bs-toggle="dropdown">
+                        <span th:text="${firstLetter}"></span>
+                    </div>
+                    <div class="dropdown-menu dropdown-menu-end w-320 pb-0 custom-dropdown">
+                        <div class="d-flex brdr-btm-1 p-3">
+                            <div class="col-auto">
+                                <div class="profile-avatar">
+                                    <span th:text="${firstLetter}"></span>
+                                </div>
+                            </div>
+                            <div class="col-11">
+                                <p class="para-f4 dmsans-semibold px-3 text-color1" sec:authentication="name">u</p>
+                                <p sec:authorize="isAuthenticated()"></p>
+                                <!--                <p sec:authorize="isAnonymous()"></p>-->
+                                <p class="para-f4 px-3 text-color6" th:text="${currentUser.firstName}"></p>
+                            </div>
+                        </div>
+                        <ul>
+                            <li class="pb-2 mt-3 px-2"><a class="dropdown-item dmsans-semibold text-color1"
+                                    href="#"><img th:src="@{assets/images/profile-icon.svg}" alt="View Profile"
+                                        class="pe-3" />View Profile</a></li>
+                            <li class="py-2 px-2"><a class="dropdown-item dmsans-semibold text-color1" href="#"><img
+                                        th:src="@{assets/images/setting-icon.svg}" alt="Account Settings"
+                                        class="pe-3" />Account Settings</a></li>
+                            <li class="py-2 px-2"><a class="dropdown-item dmsans-semibold text-color1" href="#"><img
+                                        th:src="@{assets/images/billing-icon.svg}" alt="Billing & Plans"
+                                        class="pe-3" />Billing & Plans</a></li>
+                            <li class="py-2 mb-3 px-2">
+                                <form th:action="@{/logout}" method="post" style="display:inline;">
+                                    <button type="submit" class="dropdown-item text-color8 dmsans-semibold">
+                                        <img th:src="@{/assets/images/logout-icon.svg}" alt="Sign Out" class="pe-3" />
+                                        Sign Out
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- SIDEBAR -->
+        <div class="sidebar pt-2" id="sidebar">
+            <div class="toggle-btn d-none d-lg-block text-color1 mt-3" id="toggleBtn">
+                <!-- <i class="fa-solid fa-chevron-left"></i> -->
+                <i class="fa-solid fa-angles-left"></i>
+            </div>
+            <div class="d-md-none p-3 border-bottom border-secondary">
+                <!-- <button class="btn btn-create px-4 py-2 text-white w-100 mb-2">
+              <i class="fa-solid fa-plus pe-2"></i> Create Test
+            </button> -->
+                <a class="btn btn-create p-tb-12 p-lr-16 text-white button-f2 w-100 mb-2"><img
+                        th:src="@{/assets/images/create-test-icon.svg}" alt="Icon" class="pe-2" /> Create Test</a>
+                <div class="dropdown w-100">
+                    <div class="btn-drpdwn text-color1 w-100 d-flex justify-content-between p-tb-10 p-lr-16"
+                        data-bs-toggle="dropdown">
+                        TestWheel<i class="fa-solid fa-chevron-down ps-3"></i>
+                    </div>
+                    <div class="dropdown-menu w-100 custom-dropdown">
+                        <div class="d-flex justify-content-between px-4 brdr-btm-1 py-2">
+                            <div class="col-sm-6 align-self-center">
+                                <p class="para-f3 dmsans-semibold px-2 text-color1">Your Projects</p>
+                            </div>
+                            <div class="col-sm-6 text-end">
+                                <div class="para-f3 text-color3 dmsans-semibold"><a href="">View All</a></div>
+                            </div>
+                        </div>
+                        <div class="dropdown-scroll overflow-y-auto">
+                            <ul>
+                                <li class="px-2 p-t-16 p-b-8">
+                                    <a class="dropdown-item d-flex justify-content-between" href="#">
+                                        <span>
+                                            <p class="dmsans-semibold text-color1">TestWheel</p>
+                                            <p class="text-color4 para-f4">Created by Prakash</p>
+                                        </span>
+                                        <span><img th:src="@{assets/images/project-check-icon.svg}"
+                                                alt="icon"></span></a>
+                                </li>
+                                <li class="px-2 p-t-8 p-b-8"><a class="dropdown-item dmsans-semibold text-color1"
+                                        href="#"><span>
+                                            <p class="dmsans-semibold text-color1">E-commerce Suite</p>
+                                            <p class="text-color4 para-f4">Created by Prakash</p>
+                                        </span></a></li>
+                                <li class="px-2 p-t-8 p-b-8"><a class="dropdown-item dmsans-semibold text-color1"
+                                        href="#"><span>
+                                            <p class="dmsans-semibold text-color1">API test</p>
+                                            <p class="text-color4 para-f4">Created by Prakash</p>
+                                        </span></a></li>
+
+                            </ul>
+                        </div>
+                        <div class="py-3 px-sm-2"><a class="btn btn-create p-tb-12 p-lr-16 text-white button-f2"
+                                data-bs-toggle="modal" data-bs-target="#newProject"><img
+                                    th:src="@{assets/images/create-test-icon.svg}" alt="Icon" class="pe-2">Create
+                                Project</a></div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-3 sidebar-menu">
+                <ul class="menu">
+                    <!-- <div class="m-t-36 mb-1"><p class="text-color5 sidebar-head para-f4 dmsans-semibold">Home</p></div> -->
+                    <li class="m-t-36">
+                        <a th:href="@{/dashboard}" class="active"><span class="d-flex">
+                                <img loading="lazy" th:src="@{assets/images/dashboard-icon.svg}" alt="Dashboard"
+                                    class="p-r-12 image-default">
+                                <img loading="lazy" th:src="@{assets/images/dashboard-icon-active.svg}" alt="Dashboard"
+                                    class="p-r-12 image-active">
+                                <span class="menu-text para-f3 align-self-center">Dashboard</span></span></a>
+                    </li>
+                    <li class="menu-item m-t-16">
+                        <a th:href="@{/alltest}" class="menu-link"><span class="d-flex">
+                                <img loading="lazy" th:src="@{assets/images/all-tests-icon.svg}" alt="All Tests"
+                                    class="p-r-12 image-default">
+                                <img loading="lazy" th:src="@{assets/images/all-tests-icon-active.svg}" alt="All Tests"
+                                    class="p-r-12 image-active">
+                                <span class="menu-text para-f3 align-self-center">All Tests</span></span><i
+                                class="fa-solid fa-chevron-down drpdwn-icon menu-text"></i></a>
+                        <ul class="submenu">
+                            <li><a th:href="@{/alltest}" class="menu-text p-t-12 pb-0 para-f3">API Testing</a></li>
+                            <li><a th:href="@{/alltest}" class="menu-text p-t-12 pb-0 para-f3">Mobile Testing</a></li>
+                            <li><a th:href="@{/alltest}" class="menu-text p-t-12 pb-0 para-f3">Web Testing</a></li>
+                        </ul>
+                    </li>
+                    <!-- <div class="m-t-16 mb-1"><p class="text-color5 sidebar-head para-f4 dmsans-semibold">Testing</p></div> -->
+
+                    <li class="m-t-16">
+                        <a th:href="@{/createproject}"><span class="d-flex">
+                                <img loading="lazy" th:src="@{assets/images/create-tests-icon.svg}" alt="Create Tests"
+                                    class="p-r-12 image-default">
+                                <img loading="lazy" th:src="@{assets/images/create-tests-icon-active.svg}"
+                                    alt="Create Tests" class="p-r-12 image-active">
+                                <span class="menu-text para-f3 align-self-center">Create Test</span></span></a>
+                    </li>
+                    <li class="m-t-16">
+                        <a th:href="@{/testlist}"><span class="d-flex">
+                                <img loading="lazy" th:src="@{assets/images/test-list-icon.svg}" alt="Test List"
+                                    class="p-r-12 image-default">
+                                <img loading="lazy" th:src="@{assets/images/test-list-icon-active.svg}" alt="Test List"
+                                    class="p-r-12 image-active">
+                                <span class="menu-text para-f3 align-self-center">Test List</span></span></a>
+                    </li>
+                    <!-- <div class="m-t-16 mb-1"><p class="text-color5 sidebar-head para-f4 dmsans-semibold">Reports</p></div> -->
+                    <li class="m-t-16">
+                        <a href="#"><span class="d-flex">
+                                <img loading="lazy" th:src="@{assets/images/test-report-icon.svg}" alt="Test Reports"
+                                    class="p-r-12 image-default">
+                                <img loading="lazy" th:src="@{assets/images/test-report-icon-active.svg}"
+                                    alt="Test Reports" class="p-r-12 image-active">
+                                <span class="menu-text para-f3 align-self-center">Test Reports</span></span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- BACKDROP -->
+        <div id="backdrop"></div>
+        <!-- CONTENT -->
+        <div class="content create-testcase maincontent" id="content">
+            <div class="container-fluid">
+                <div class="row justify-content-center p-t-36 top-row">
+                    <div class="col-auto">
+                        <div class="stepper-wrapper">
+                            <div class="stepper-item active">
+                                <div class="step-content">
+                                    <div class="step-counter">1</div>
+                                    <div class="step-name">Platform</div>
+                                </div>
+                                <div class="step-line"></div>
+                            </div>
+                            <div class="stepper-item">
+                                <div class="step-content">
+                                    <div class="step-counter">2</div>
+                                    <div class="step-name">Details</div>
+                                </div>
+                                <div class="step-line"></div>
+                            </div>
+                            <div class="stepper-item">
+                                <div class="step-content">
+                                    <div class="step-counter">3</div>
+                                    <div class="step-name">Input</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${successMessage}" class="alert alert-success">
+                    <p th:text="${successMessage}"></p>
+                </div>
+                <script>
+                    window.addEventListener('DOMContentLoaded', function () {
+                        const alertBox = document.getElementById("successAlert");
+                        if (alertBox) {
+                            setTimeout(function () {
+                                alertBox.style.transition = "opacity 0.5s ease";
+                                alertBox.style.opacity = "0";
+                                setTimeout(function () { alertBox.style.display = "none"; }, 500);
+                            }, 3000); // 3 seconds
+                        }
+                    });
+                </script>
+
+
+                <div class="content-center-tb m-t-36">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-auto col-md-9">
+                            <div class="step select-step active" id="step1">
+                                <h2 class="head-h2 dmsans-semibold px-3 text-color1 text-center">Select Testing Platform
+                                </h2>
+                                <p class="para-f3 dmsans-regular text-color4 m-t-8 text-center">Choose the platform you
+                                    want to test</p>
+                                <div class="row g-4 m-t-24">
+                                    <div class="col-lg-4">
+                                        <div class="card card-select" onclick="selectItem('Web Testing', this)">
+                                            <div class="card-body py-0 text-center">
+                                                <img th:src="@{assets/images/web-testing.svg}" alt="Web Testing"
+                                                    width="64px" height="64px" class="mw-100">
+                                                <p class="head-h4 dmsans-semibold px-3 text-color1 text-center m-t-16">
+                                                    Web Testing</p>
+                                                <p class="para-f4 dmsans-regular text-color1 m-t-8 text-center">Test web
+                                                    applications and websites</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="card card-select h-100" onclick="selectItem('API Testing', this)">
+                                            <div class="card-body py-0  text-center">
+                                                <img th:src="@{assets/images/api-testing.svg}" alt="API Testing"
+                                                    width="64px" height="64px" class="mw-100">
+                                                <p class="head-h4 dmsans-semibold px-3 text-color1 text-center m-t-16">
+                                                    API Testing</p>
+                                                <p class="para-f4 dmsans-regular text-color1 m-t-8 text-center">Test
+                                                    REST APIs and endpoints</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="card card-select" onclick="selectItem('Mobile Testing', this)">
+                                            <div class="card-body py-0  text-center">
+                                                <img th:src="@{assets/images/mobile-testing.svg}" alt="Mobile Testing"
+                                                    width="64px" height="64px" class="mw-100">
+                                                <p
+                                                    class="head-h4 dmsans-semibold px-xxl-3 text-color1 text-center m-t-16">
+                                                    Mobile Testing</p>
+                                                <p class="para-f4 dmsans-regular text-color1 m-t-8 text-center">Test
+                                                    Android and iOS applications</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center m-t-36">
+                        <div class="col-lg-9 col-xl-6 col-xxl-5 px-0">
+                            <!-- STEP 2 (DETAILS FORM) -->
+                            <div class="step" id="step2">
+                                <h2 class="head-h2 dmsans-semibold px-3 text-color1 text-center">Enter Test Details</h2>
+                                <p class="para-f3 dmsans-regular text-color4 m-t-8 text-center">Choose the platform you
+                                    want to test</p>
+
+
+                                <form id="testForm1" method="post" th:object="${testEntity}"
+                                    enctype="multipart/form-data">
+                                    <div class="p-t-16">
+                                        <label class="form-label px-0">Test Name *</label>
+                                        <input type="text" id="productName" th:field="*{testName}"
+                                            class="form-control form-input" placeholder="e.g., Login Flow Test">
+                                        <div id="" class="text-color9 error-text px-0 pt-1">
+                                            <small id="testNameFeedback" class="d-block m-t-5"
+                                                style="font-weight: 500;"></small>
+                                            <small th:if="${#fields.hasErrors('testName')}" th:errors="*{testName}"
+                                                style="color:red; font-weight:bold;"></small>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="p-t-16 module-wrapper">
+                                        <label class="form-label">Module *</label>
+                                        <input type="text" id="modules" th:field="*{modules}"
+                                            class="form-control form-input" placeholder="Search or create module...">
+                                        <small th:if="${#fields.hasErrors('modules')}" th:errors="*{modules}"
+                                            style="color:red; font-weight:bold;"></small>
+                                        <small id="moduleFeedback" class="d-block m-t-5">Select the module</small>
+                                    </div>
+
+                                    <div class="p-t-16 module-wrapper">
+                                        <label class="form-label">Tags</label>
+                                        <input type="text" id="tagInput" th:field="*{tag}"
+                                            class="form-control form-input"
+                                            placeholder="Type and press Enter to add tags">
+                                        <small th:if="${#fields.hasErrors('tag')}" th:errors="*{tag}"
+                                            style="color:red; font-weight:bold;"></small>
+                                        <small id="tagFeedback" class="d-block m-t-5">Select the tag</small>
+                                    </div>
+
+                                    <div class="p-t-16">
+                                        <label class="form-label">Description</label>
+                                        <textarea id="description" th:field="*{description}"
+                                            class="form-control form-input" rows="6" cols="50"
+                                            placeholder="Describe what this test does..."></textarea>
+                                        <small th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
+                                            style="color:red; font-weight:bold;"></small>
+                                        <small id="descriptionFeedback" class="d-block m-t-5">Enter the
+                                            description</small>
+                                    </div>
+                                </form>
+
+
+                                <div class="row m-t-36 justify-content-center">
+                                    <div class="col-md-6">
+                                        <button
+                                            class="btn btn-border-bg dmsans-semibold w-100 px-lg-4 p-t-12 p-b-12 text-color1"
+                                            onclick="goToStep(1)">Back</button>
+                                    </div>
+                                    <div class="col-md-6 m-t-24 mt-md-0">
+                                        <button type="button"
+                                            class="btn btn-create dmsans-semibold w-100 px-lg-4 p-t-12 p-b-12 text-white"
+                                            onclick="goToStep(3)">Next</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3 (UPLOAD FORM) -->
+                        <!-- <div class="col-lg-10 px-0"> -->
+                        <div class="step" id="step3">
+
+                            <form id="testForm2" th:action="@{/createtest}" method="post" th:object="${testEntity}">
+
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-7 col-xl-6 col-xxl-5">
+                                        <div id="sectionA" class="step3-section d-none">
+                                            <h2 class="head-h2 dmsans-semibold px-3 text-color1 text-center">Provide
+                                                Input</h2>
+                                            <p class="para-f3 dmsans-regular text-color4 m-t-8 text-center">Enter the
+                                                URL to test</p>
+                                            <div class="p-t-16">
+                                                <label class="form-label px-0">Website URL *</label>
+                                                <input th:field="*{WebsiteUrl}" type="text" id="websiteUrl"
+                                                    class="form-control form-input" placeholder="https://example.com">
+                                                <div id="" class="text-color9 error-text px-0 pt-1">
+                                                    <small th:if="${#fields.hasErrors('WebsiteUrl')}"
+                                                        th:errors="*{WebsiteUrl}"
+                                                        style="color:red; font-weight:bold;"></small>
+                                                    <small id="websiteUrlFeedback" class="d-block m-t-5">Enter Website
+                                                        URL</small>
+                                                </div>
+                                            </div>
+
+                                            <style>
+                                                /* Default checkbox style */
+                                                .form-check-input {
+                                                    width: 20px;
+                                                    height: 20px;
+                                                    cursor: pointer;
+                                                }
+
+                                                /* When checked, show green background with tick */
+                                                .form-check-input:checked {
+                                                    content: "✔";
+                                                    background-color: #28a745;
+                                                    /* Bootstrap green */
+                                                    border-color: #28a745;
+                                                    position: relative;
+                                                }
+
+                                                /* Add tick mark overlay */
+                                                .form-check-input:checked::after {
+                                                    content: "✔";
+                                                    color: green;
+                                                    font-size: 14px;
+                                                    position: absolute;
+                                                    top: 0;
+                                                    left: 4px;
+                                                }
+                                            </style>
+
+
+                                            <div class="form-check p-t-16 d-flex align-items-center">
+                                                <input class="form-check-input form-checkbox me-2 mt-0" type="checkbox"
+                                                    th:field="*{backendApiTest}" id="backendApiTest"
+                                                    onchange="updateBoolean(this)">
+                                                <label class="form-check-label mb-0 text-color1 para-f4 dmsans-regular"
+                                                    for="backendApiTest"> Tests backend APIs along with UI
+                                                    actions</label>
+
+                                            </div>
+                                            <script>
+                                                function updateBoolean(cb) {
+                                                    const value = cb.checked;   // true if ticked, false if unticked
+                                                    console.log("Boolean result:", value);
+
+                                                    // Example: store in hidden field if needed
+                                                    document.getElementById("backendApiHidden").value = value;
+                                                }
+                                            </script>
+
+                                            <!-- Hidden field if you want to explicitly send boolean -->
+                                            <input type="hidden" id="backendApiHidden" name="backendApiTest"
+                                                value="false">
+
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-7 col-xl-6 col-xxl-5">
+                                        <div id="sectionB" class="step3-section d-none">
+                                            <h2 class="head-h2 dmsans-semibold px-3 text-color1 text-center">Provide
+                                                Input</h2>
+                                            <p class="para-f3 dmsans-regular text-color4 m-t-8 text-center">Enter the
+                                                URL to test</p>
+                                            <div class="p-t-16">
+                                                <label class="form-label px-0">APK File *</label>
+                                                <label class="file-upload text-center p-t-36 p-b-36 w-100"
+                                                    for="fileUpload">
+                                                    <div class="icon mb-2">
+                                                        <img th:src="@{assets/images/upload-icon.svg}" alt="File Upload"
+                                                            class="mw-100">
+                                                    </div>
+                                                    <p class="mb-0 dmsans-medium text-color1 para-f4">Click to upload
+                                                        APK</p>
+                                                    <p class="mb-0 dmsans-regular text-color4 para-f4">Supports .apk
+                                                        files up to 100MB</p>
+                                                    <input type="file" name="apk" class="form-control d-none"
+                                                        id="fileUpload" accept=".apk" multiple>
+                                                </label>
+                                                <div id="" class="text-color9 error-text px-0 pt-1">Upload</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+
+                                <div id="sectionC" class="step3-section d-none">
+                                    <h2 class="head-h2 dmsans-semibold px-3 text-color1 text-center">
+                                        Select API Protocol
+                                    </h2>
+
+                                    <p class="para-f3 dmsans-regular text-color4 m-t-8 text-center">
+                                        Choose the protocol type for your API testing
+                                    </p>
+
+                                    <!-- Selected protocol -->
+                                    <input type="hidden" id="APIprotocol" th:field="*{APIprotocol}">
+
+                                    <div class="row m-t-8">
+
+                                        <!-- HTTP / REST -->
+                                        <div class="col-md-6 m-t-16">
+                                            <div class="card mb-3 api-bg bg-color2 api-protocol-card"
+                                                data-protocol="HTTP / REST" onclick="selectApiProtocol(this)">
+
+                                                <div class="row g-0 py-4 px-3 py-xl-0 px-xl-0">
+                                                    <div class="col-2">
+                                                        <img th:src="@{assets/images/http-rest.svg}"
+                                                            class="img-fluid rounded-start" alt="HTTP / REST">
+                                                    </div>
+
+                                                    <div class="col-10">
+                                                        <div class="card-body py-0">
+                                                            <p class="para-f3 dmsans-semibold text-color1">
+                                                                HTTP / REST
+                                                            </p>
+
+                                                            <p class="para-f4 dmsans-regular text-color4 p-t-4">
+                                                                Test RESTful APIs with GET, POST, PUT,
+                                                                <br class="d-none d-xxl-block">
+                                                                DELETE methods
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <!-- WebSocket -->
+                                        <div class="col-md-6 m-t-16">
+                                            <div class="card mb-3 coming-soon-card position-relative bg-color2">
+
+                                                <span class="badge coming-badge">Coming Soon</span>
+
+                                                <div class="row g-0 py-4 px-3 py-xl-0 px-xl-0">
+                                                    <div class="col-2 text-muted">
+                                                        <img th:src="@{assets/images/websocket.svg}"
+                                                            class="img-fluid rounded-start" alt="WebSocket">
+                                                    </div>
+
+                                                    <div class="col-10">
+                                                        <div class="card-body py-0">
+                                                            <p class="para-f3 dmsans-semibold text-color1 text-muted">
+                                                                WebSocket
+                                                            </p>
+
+                                                            <p
+                                                                class="para-f4 dmsans-regular text-color4 p-t-4 text-muted">
+                                                                Test real-time bidirectional
+                                                                <br class="d-none d-xxl-block">
+                                                                communication
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <!-- GraphQL -->
+                                        <div class="col-md-6 m-t-16">
+                                            <div class="card mb-3 coming-soon-card position-relative bg-color2">
+
+                                                <span class="badge coming-badge">Coming Soon</span>
+
+                                                <div class="row g-0 py-4 px-3 py-xl-0 px-xl-0">
+                                                    <div class="col-2 text-muted">
+                                                        <img th:src="@{assets/images/graphql.svg}"
+                                                            class="img-fluid rounded-start" alt="GraphQL">
+                                                    </div>
+
+                                                    <div class="col-10">
+                                                        <div class="card-body py-0">
+                                                            <p class="para-f3 dmsans-semibold text-color1 text-muted">
+                                                                GraphQL
+                                                            </p>
+
+                                                            <p
+                                                                class="para-f4 dmsans-regular text-color4 p-t-4 text-muted">
+                                                                Test GraphQL queries, mutations,
+                                                                <br class="d-none d-xxl-block">
+                                                                and subscriptions
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <!-- gRPC -->
+                                        <div class="col-md-6 m-t-16">
+                                            <div class="card mb-3 coming-soon-card position-relative bg-color2">
+
+                                                <span class="badge coming-badge">Coming Soon</span>
+
+                                                <div class="row g-0 py-4 px-3 py-xl-0 px-xl-0">
+                                                    <div class="col-2 text-muted">
+                                                        <img th:src="@{assets/images/grpc.svg}"
+                                                            class="img-fluid rounded-start" alt="gRPC">
+                                                    </div>
+
+                                                    <div class="col-10">
+                                                        <div class="card-body py-0">
+                                                            <p class="para-f3 dmsans-semibold text-color1 text-muted">
+                                                                gRPC
+                                                            </p>
+
+                                                            <p
+                                                                class="para-f4 dmsans-regular text-color4 p-t-4 text-muted">
+                                                                Test high-performance RPC
+                                                                <br class="d-none d-xxl-block">
+                                                                framework APIs
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Validation message -->
+                                    <small id="apiProtocolFeedback" class="d-block text-center mt-2"
+                                        style="font-weight: 500;">
+                                    </small>
+                                </div>
+
+
+
+                                <style>
+                                    .api-protocol-card {
+                                        cursor: pointer;
+                                        border: 2px solid transparent;
+                                        transition: all 0.2s ease;
+                                    }
+
+                                    .api-protocol-card:hover {
+                                        border-color: #28a745;
+                                    }
+
+                                    .api-protocol-card.active {
+                                        border: 2px solid #28a745;
+                                        background-color: #f0fff4;
+                                        box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.15);
+                                    }
+                                </style>
+
+                                <script>
+                                    function selectApiProtocol(card) {
+
+                                        // Remove active state from all selectable protocol cards
+                                        document.querySelectorAll('.api-protocol-card').forEach(function (item) {
+                                            item.classList.remove('active');
+                                        });
+
+                                        // Add active state to selected card
+                                        card.classList.add('active');
+
+                                        // Get selected protocol
+                                        const protocol = card.dataset.protocol;
+
+                                        // Store selected protocol
+                                        const protocolInput = document.getElementById('APIprotocol');
+
+                                        if (protocolInput) {
+                                            protocolInput.value = protocol;
+                                        }
+
+                                        // Clear validation message
+                                        const feedback = document.getElementById('apiProtocolFeedback');
+
+                                        if (feedback) {
+                                            feedback.textContent = '';
+                                        }
+
+                                        console.log('Selected API Protocol:', protocol);
+                                    }
+                                </script>
+
+
+
+
+
+
+                            </form>
+                            <div class="row justify-content-center">
+                                <div class="col-lg-7 col-xl-6 col-xxl-5 px-0">
+                                    <div class="row m-t-36 justify-content-center">
+                                        <div class="col-md-6">
+                                            <button
+                                                class="btn btn-border-bg dmsans-semibold w-100 px-lg-4 p-t-12 p-b-12 text-color1"
+                                                onclick="goToStep(2)">Back</button>
+                                        </div>
+                                        <div class="col-md-6 m-t-24 mt-md-0">
+                                            <button type="button"
+                                                class="btn btn-create dmsans-semibold w-100 px-lg-4 p-t-12 p-b-12 text-white"
+                                                onclick="submitBothForms()">Complete Setup</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function goToStep(stepNumber) {
+                let valid = true;
+
+                // Validate Test Name
+                const testName = document.getElementById("productName");
+                const testNameFeedback = document.getElementById("testNameFeedback");
+                if (!testName.value.trim()) {
+                    testNameFeedback.textContent = "Test Name is required";
+                    testNameFeedback.style.color = "red";
+                    testNameFeedback.style.fontWeight = "bold";
+                    valid = false;
+                } else {
+                    testNameFeedback.textContent = "";
+                }
+
+                // Validate Module
+                const modules = document.getElementById("modules");
+                const moduleFeedback = document.getElementById("moduleFeedback");
+                if (!modules.value.trim()) {
+                    moduleFeedback.textContent = "Module is required";
+                    moduleFeedback.style.color = "red";
+                    moduleFeedback.style.fontWeight = "bold";
+                    valid = false;
+                } else {
+                    moduleFeedback.textContent = "";
+                }
+
+                // Validate Tag
+                const tagInput = document.getElementById("tagInput");
+                const tagFeedback = document.getElementById("tagFeedback");
+                if (!tagInput.value.trim()) {
+                    tagFeedback.textContent = "Tag is required";
+                    tagFeedback.style.color = "red";
+                    tagFeedback.style.fontWeight = "bold";
+                    valid = false;
+                } else {
+                    tagFeedback.textContent = "";
+                }
+
+                // Validate Description
+                const description = document.getElementById("description");
+                const descriptionFeedback = document.getElementById("descriptionFeedback");
+                if (!description.value.trim()) {
+                    descriptionFeedback.textContent = "Description is required";
+                    descriptionFeedback.style.color = "red";
+                    descriptionFeedback.style.fontWeight = "bold";
+                    valid = false;
+                } else {
+                    descriptionFeedback.textContent = "";
+                }
+
+                // Only go to next step if valid
+                if (valid) {
+                    // your existing step navigation logic
+                    console.log("Proceeding to step " + stepNumber);
+                    // e.g. show/hide sections
+                }
+            }
+        </script>
+
+
+        <script>
+            let selectedItem = "";
+
+            function selectItem(item, el) {
+                selectedItem = item;
+
+                document.querySelectorAll('.card-select').forEach(c => c.classList.remove('active'));
+                el.classList.add('active');
+
+                // move to step 2
+                goToStep(2);
+
+                // prefill step 2
+                document.getElementById('productName').value = selectedItem;
+            }
+
+            function goToStep(step) {
+
+                // stepper UI
+                document.querySelectorAll('.stepper-item').forEach((item, index) => {
+                    item.classList.remove('active', 'completed');
+
+                    if (index + 1 < step) item.classList.add('completed');
+                    else if (index + 1 === step) item.classList.add('active');
+                });
+
+                // show step
+                document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+                document.getElementById('step' + step).classList.add('active');
+
+                // fill step 3
+                if (step === 3) {
+                    // document.getElementById('finalProduct').value = document.getElementById('productName').value;
+                    if (step === 3) {
+
+                        // hide all sections
+                        document.querySelectorAll('.step3-section')
+                            .forEach(sec => sec.classList.add('d-none'));
+
+                        // show based on step 1 selection
+                        if (selectedItem === 'Web Testing') {
+                            document.getElementById('sectionA').classList.remove('d-none');
+                        }
+
+                        else if (selectedItem === 'Mobile Testing') {
+                            document.getElementById('sectionB').classList.remove('d-none');
+                        }
+
+                        else if (selectedItem === 'API Testing') {
+                            document.getElementById('sectionC').classList.remove('d-none');
+                        }
+                    }
+                }
+            }
+
+
+        </script>
+
+        <script>
+            const uploadBox = document.querySelector('.file-upload');
+            const fileInput = document.getElementById('fileUpload');
+
+            uploadBox.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadBox.classList.add('active');
+            });
+
+            uploadBox.addEventListener('dragleave', () => {
+                uploadBox.classList.remove('active');
+            });
+
+            uploadBox.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadBox.classList.remove('active');
+
+                fileInput.files = e.dataTransfer.files;
+
+                console.log(fileInput.files);
+            });
+        </script>
+
+        <script type="text/javascript">
+            const searchInput = document.getElementById("searchInput");
+            const suggestions = document.getElementById("suggestions");
+
+            searchInput.addEventListener("input", () => {
+                suggestions.classList.toggle(
+                    "d-none",
+                    searchInput.value.trim() === ""
+                );
+            });
+        </script>
+
+        <script>
+            const tagInput = document.getElementById("tagInput");
+            const tagContainer = document.getElementById("tagContainer");
+
+            tagInput.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+
+                    const value = this.value.trim();
+                    if (!value) return;
+
+                    const tag = document.createElement("span");
+                    tag.className = "inputtag";
+
+                    tag.innerHTML = `
+                    ${value}
+                    <button onclick="this.parentElement.remove()">×</button>
+                `;
+
+                    tagContainer.appendChild(tag);
+                    this.value = "";
+                }
+            });
+        </script>
+
+
+        <script>
+            function submitBothForms() {
+                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+
+                // Collect inputs
+                const testName = document.getElementById('productName')?.value || '';
+                const modules = document.getElementById('modules')?.value || '';
+                const tag = document.getElementById('tagInput')?.value || '';
+                const description = document.getElementById('description')?.value || '';
+                const websiteUrl = document.getElementById('websiteUrl')?.value || '';
+                const backendApiTest = document.getElementById('backendApiTest')?.checked || false;
+                const apiProtocolInput = document.getElementById('APIprotocol');
+                const apiProtocol = apiProtocolInput ? apiProtocolInput.value.trim() : '';
+
+                if (selectedItem === 'API Testing' && !apiProtocol) {
+
+                    const feedback = document.getElementById('apiProtocolFeedback');
+
+                    if (feedback) {
+                        feedback.textContent = "Please select API protocol";
+                        feedback.style.color = "red";
+                        feedback.style.fontWeight = "bold";
+                    }
+
+                    return;
+                }
+
+
+
+                // Collect file
+                const apkFile = document.getElementById('fileUpload')?.files[0];
+
+                // Use FormData for file + text
+                const formData = new FormData();
+                formData.append('testName', testName);
+                formData.append('modules', modules);
+                formData.append('tag', tag);
+                formData.append('description', description);
+                formData.append('WebsiteUrl', websiteUrl);
+                formData.append('backendApiTest', backendApiTest);
+                formData.append('APIprotocol', apiProtocol);
+                if (apkFile) {
+                    formData.append('apk', apkFile);
+                }
+
+                // POST to /createtest
+                fetch('/createtest', {
+                    method: 'POST',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                        // ⚠️ Do NOT set Content-Type manually; browser sets it with boundary
+                    },
+                    body: formData,
+                    credentials: 'include'
+                })
+                    .then(response => {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else {
+                            window.location.href = '/create-testcase';
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Upload failed:", error);
+                    });
+            }
+        </script>
+
+
+
+        <script>
+            function loadNotifications() {
+                fetch('/notifications')
+                    .then(response => response.json())
+                    .then(data => {
+                        let dropdown = document.getElementById('notificationDropdown');
+                        dropdown.innerHTML = ""; // clear old items
+
+                        // Header
+                        dropdown.innerHTML += `
+                      <div class="d-flex justify-content-between px-4 brdr-btm-1 py-3">
+                        <div class="col-sm-6">
+                          <p class="para-f3 dmsans-semibold text-color1">
+                            Notifications <span class="badge badge-circle">${data.length}</span>
+                          </p>
+                        </div>
+                        <div class="col-sm-6 text-end">
+                          <p class="para-f3 text-color3 dmsans-semibold"><a href="#">Mark all as read</a></p>
+                        </div>
+                      </div>`;
+
+                        // Loop notifications
+                        data.forEach(note => {
+                            dropdown.innerHTML += `
+                          <div class="brdr-btm-1 d-flex bg-color2 p-3">
+                            <div class="col-auto"><img src="/assets/images/test-execution.svg" alt="Icon" /></div>
+                            <div class="col-11">
+                              <p class="para-f4 dmsans-semibold px-3 text-color1">${note.title}
+                                <span class="dot bg-color3 ms-1 mt-2"></span>
+                              </p>
+                              <p class="para-f4 px-3 text-color6">${note.message}</p>
+                              <p class="para-f4 px-3 text-color6">${note.timeAgo}</p>
+                            </div>
+                          </div>`;
+                        });
+
+                        // Footer
+                        dropdown.innerHTML += `
+                      <div class="py-3 px-3">
+                        <a class="dropdown-item text-color3 dmsans-semibold text-center" href="#">View all notifications</a>
+                      </div>`;
+
+                        // update badge count
+                        document.getElementById('notificationBadge').textContent = data.length;
+                    });
+            }
+        </script>
+
+
+        <script th:src="@{assets/js/tw-scripts.js}"></script>
+        <script th:src="@{assets/js/jquery.min.js}"></script>
+        <script th:src="@{assets/js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>

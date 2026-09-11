@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+    TestWheel - Signup
+  </title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link th:href="@{/assets/css/common-styles.css}" rel="stylesheet">
+  <link th:href="@{/assets/css/login-styles.css}" rel="stylesheet">
+  <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet">
+  <link th:href="@{/assets/fontawesome/css/all.min.css}" rel="stylesheet">
+  <script th:src="@{/assets/js/jquery.min.js}"></script>
+  <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+</head>
+
+<body>
+  <div class="layout">
+    <!-- Header -->
+    <div class="fixed-top py-0 px-3 px-sm-4 box-shadow bg-white">
+      <nav class="navbar navbar-expand-lg justify-content-between py-0">
+        <div class="container-fluid container-xxl justify-content-between px-0 p-tb-11">
+          <a class="navbar-brand col-auto me-0 py-0" th:href="@{/login}">
+            <img th:src="@{/assets/images/tw-logo.svg}" alt="TestWheel Logo" height="60px">
+          </a>
+        </div>
+      </nav>
+    </div>
+    <!-- end of header -->
+    <!-- body content -->
+    <div class="body-content">
+      <section class="p-t-16">
+        <div class="container-fluid container-xxl">
+          <div class="row justify-content-lg-between justify-content-center">
+            <!-- <div class="col-lg-6 col-xxl-5 text-xl-start position-relative order-2 order-lg-1 py-5 py-lg-0 signup-bg"> -->
+            <!-- <img decoding="async" class="mw-600 border-r-24" src="assets/images/sign-up-img.webp"  alt="Login"> -->
+            <div
+              class="col-lg-6 col-xxl-6 col-md-8 col-10 text-xl-start order-2 order-lg-1 justify-content-center pt-5 pt-lg-0">
+              <!-- <div class="pstn-abslt px-4"> -->
+              <div class="signup-bg">
+                <h1 class="text-white head-h3">Start Your 14-day free trial</h1>
+                <ul class="list-checkmark">
+                  <li class="text-white para-p1 fs-r-16 fw-normal m-t-24">No Credit Card Required</li>
+                  <li class="text-white para-p1 fs-r-16 fw-normal m-t-24">100% cloud-based<br>No installation,
+                    launchers, or browser extensions</li>
+                  <li class="text-white para-p1 fs-r-16 fw-normal m-t-24">All-in-one platform<br>Web, native mobile,
+                    API, performance and security testing</li>
+                  <li class="text-white para-p1 fs-r-16 fw-normal m-t-24">No-code testing<br>Author tests using AI. Test
+                    Cases written in plain english.</li>
+                  <li class="text-white para-p1 fs-r-16 fw-normal m-t-24">Run multiple regression tests simultaneously
+                  </li>
+                  <li class="text-white para-p1 fs-r-16 fw-normal m-t-24">Auto-generated Test Summary Reports</li>
+                  <li class="text-white para-p1 fs-r-16 fw-normal m-t-24">Convert manual test cases to automated ones
+                    with AI</li>
+                  <li class="text-white para-p1 fs-r-16 fw-normal m-t-24">Reduce testing time by up to 60%</li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-8 col-xxl-5 align-self-center order-1 order-lg-2">
+              <div class="row justify-content-center">
+                <h2 class="text-color1 head-h4 dmsans-bold m-b-32 pt-5 pt-lg-0">Sign up for free today! Begin testing in
+                  minutes!</h2>
+                <div class="frm-scrl">
+                  <!-- Flash message container -->
+                  <div th:if="${message}" class="alert alert-danger alert-dismissible fade show m-b-24" role="alert">
+                    <span th:text="${message}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+
+
+                  <form id="signupForm" th:action="@{/signup}" method="post" th:object="${user}">
+                    <div class="row">
+                      <div class="col-md-6 m-b-24">
+                        <label for="fname" class="form-label label-fnt dmsans-medium">First Name*</label>
+                        <input type="text" th:field="*{firstName}" class="form-control input-bg"
+                          placeholder="Enter First Name" id="fname" required>
+                        <small id="fnameFeedback" class="d-block m-t-5"></small>
+                        <small th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"
+                          style="color:red; font-weight:bold;"></small>
+                      </div>
+
+                      <div class="col-md-6 m-b-24">
+                        <label for="lname" class="form-label label-fnt dmsans-medium">Last name*</label>
+                        <input type="text" th:field="*{lastName}" class="form-control input-bg"
+                          placeholder="Enter Last Name" id="lname" required>
+                        <small id="lnameFeedback" class="d-block m-t-5"></small>
+                        <small th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"
+                          style="color:red; font-weight:bold;"></small>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12 m-b-24">
+                        <label for="email" class="form-label label-fnt dmsans-medium">Business email*</label>
+                        <input type="email" th:field="*{username}" class="form-control input-bg"
+                          placeholder="ex. email@domain.com" id="email" required>
+                        <small id="usernameFeedback" class="d-block m-t-5"></small>
+                        <small th:if="${#fields.hasErrors('username')}" th:errors="*{username}"
+                          style="color:red; font-weight:bold;"></small>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12 m-b-24">
+                        <label for="phone" class="form-label label-fnt dmsans-medium">Phone number</label>
+                        <div class="input-group bg-color1">
+                          <select class="form-select form-select-bg" th:field="*{phoneCode}">
+                            <option th:each="c : ${countries}" th:value="${'+' + c.calling_code}"
+                              th:text="${c.country + ' (+' + c.calling_code + ')'}"
+                              th:selected="${c.calling_code == 91}">
+                            </option>
+                          </select>
+                          <span class="align-self-center color-input"> | </span>
+                          <input type="tel" class="form-control input-bg brdr-radius-lft"
+                            placeholder="Enter phone number" id="phone" th:field="*{phone}">
+                        </div>
+                        <small id="phoneFeedback" class="d-block m-t-5"></small>
+                        <small th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"
+                          style="color:red; font-weight:bold;"></small>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12 m-b-24">
+                        <label for="password" class="form-label label-fnt dmsans-medium">Password*</label>
+                        <div class="input-group bg-color1">
+                          <input type="password" class="form-control input-bg" placeholder="Enter Password"
+                            id="password" th:field="*{password}" required minlength="6">
+                          <i class="fa-solid toggle-password-eye text-color1 fa-eye" id="togglePassword"
+                            style="cursor: pointer;"></i>
+                        </div>
+                        <small id="passwordStrengthFeedback" class="d-block m-t-5" style="font-weight: 500;"></small>
+                        <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
+                          style="color:red; font-weight:bold;"></small>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12 m-b-24">
+                        <label for="confirmPassword" class="form-label label-fnt dmsans-medium">Confirm
+                          Password*</label>
+                        <div class="input-group bg-color1">
+                          <input type="password" class="form-control input-bg" placeholder="Confirm Password"
+                            id="confirmPassword" th:field="*{confirmPassword}" required>
+                          <i class="fa-solid toggle-password-eye text-color1 fa-eye" id="togglePassword1"
+                            style="cursor: pointer;"></i>
+                        </div>
+                        <small id="confirmPasswordFeedback" class="d-block m-t-5"></small>
+                        <small th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"
+                          style="color:red; font-weight:bold;"></small>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12 m-b-24">
+                        <p class="text-color1 dmsans-medium fs-14">
+                          By signing in, you agree with the
+                          <a href="/terms-conditions" class="text-color1 text-decoration-underline">Terms of Service</a>
+                          and
+                          <a href="/privacy-policy" class="text-color1 text-decoration-underline">Privacy Policy</a>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12 m-b-24">
+                        <button type="submit" class="btn btn-blue btn-border-r py-3 px-4 w-100 fs-18 icon-hover">
+                          Get started free
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12 m-b-24">
+                        <div class="line">
+                          <span class="text-color1">or Sign in With</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12 m-b-24">
+                        <div class="d-flex justify-content-center">
+                          <a class="me-3" th:href="@{/login-google}">
+                            <img th:src="@{/assets/images/google-img.svg}" alt="Google-Logo" loading="lazy">
+                          </a>
+                          <a class="ms-2" th:href="@{/login-microsoft}">
+                            <img th:src="@{/assets/images/microsoft-img.svg}" alt="Microsoft-Logo" loading="lazy">
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12">
+                        <p class="dmsans-medium text-center para-p">
+                          Already have an account?
+                          <a th:href="@{/login}" class="text-color3">Login</a>
+                        </p>
+                      </div>
+                    </div>
+                  </form>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <!-- end of layout -->
+</body>
+
+</html>
+<script>
+  setTimeout(() => {
+    const alertBox = document.querySelector('.alert');
+    if (alertBox) {
+      alertBox.style.transition = "opacity 0.5s";
+      alertBox.style.opacity = "0";
+      setTimeout(() => alertBox.remove(), 500);
+    }
+  }, 5000);
+</script>
+
+<!-- <style>
+  .error-border {
+    border: 1px solid red !important;
+  }
+
+  .valid-border {
+    border: 1px solid green !important;
+  }
+</style> -->
+
+<script>
+  // Toggle Password Visibility
+  document.getElementById("togglePassword")?.addEventListener("click", function () {
+    const pwdInput = document.getElementById("password");
+    if (pwdInput.type === "password") {
+      pwdInput.type = "text";
+      this.classList.remove("fa-eye");
+      this.classList.add("fa-eye-slash");
+    } else {
+      pwdInput.type = "password";
+      this.classList.remove("fa-eye-slash");
+      this.classList.add("fa-eye");
+    }
+  });
+
+  document.getElementById("togglePassword1")?.addEventListener("click", function () {
+    const confirmPwdInput = document.getElementById("confirmPassword");
+    if (confirmPwdInput.type === "password") {
+      confirmPwdInput.type = "text";
+      this.classList.remove("fa-eye");
+      this.classList.add("fa-eye-slash");
+    } else {
+      confirmPwdInput.type = "password";
+      this.classList.remove("fa-eye-slash");
+      this.classList.add("fa-eye");
+    }
+  });
+
+  // Input Elements
+  const fname = document.getElementById("fname");
+  const lname = document.getElementById("lname");
+  const emailInput = document.getElementById("email");
+  const phoneInput = document.getElementById("phone");
+  const pwd = document.getElementById("password");
+  const confirmPwd = document.getElementById("confirmPassword");
+
+  // Feedback Elements
+  const fnameFeedback = document.getElementById("fnameFeedback");
+  const lnameFeedback = document.getElementById("lnameFeedback");
+  const emailFeedback = document.getElementById("usernameFeedback");
+  const phoneFeedback = document.getElementById("phoneFeedback");
+  const pwdStrengthFeedback = document.getElementById("passwordStrengthFeedback");
+  const confirmFeedback = document.getElementById("confirmPasswordFeedback");
+
+  // 1. First Name Live Validation
+  fname?.addEventListener("input", function () {
+    const val = this.value.trim();
+    if (!val) {
+      if (fnameFeedback) {
+        fnameFeedback.textContent = " First name is required";
+        fnameFeedback.style.color = "red";
+      }
+      this.classList.add("error-border");
+      this.classList.remove("valid-border");
+    } else {
+      if (fnameFeedback) fnameFeedback.textContent = "";
+      this.classList.remove("error-border");
+      this.classList.add("valid-border");
+    }
+  });
+
+  // 2. Last Name Live Validation
+  lname?.addEventListener("input", function () {
+    const val = this.value.trim();
+    if (!val) {
+      if (lnameFeedback) {
+        lnameFeedback.textContent = " Last name is required";
+        lnameFeedback.style.color = "red";
+      }
+      this.classList.add("error-border");
+      this.classList.remove("valid-border");
+    } else {
+      if (lnameFeedback) lnameFeedback.textContent = "";
+      this.classList.remove("error-border");
+      this.classList.add("valid-border");
+    }
+  });
+
+  // 3. Email Live Validation & Availability Check
+  let isEmailAvailable = true;
+  emailInput?.addEventListener("input", function () {
+    const email = this.value.trim();
+
+    if (!email) {
+      if (emailFeedback) {
+        emailFeedback.textContent = " Email is required";
+        emailFeedback.style.color = "red";
+      }
+      this.classList.add("error-border");
+      this.classList.remove("valid-border");
+      isEmailAvailable = false;
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      if (emailFeedback) {
+        emailFeedback.textContent = " Invalid email format";
+        emailFeedback.style.color = "red";
+      }
+      this.classList.add("error-border");
+      this.classList.remove("valid-border");
+      isEmailAvailable = false;
+      return;
+    }
+
+    fetch(`/check-email?email=${encodeURIComponent(email)}`)
+      .then(res => res.json())
+      .then(isAvailable => {
+        isEmailAvailable = isAvailable;
+        if (emailFeedback) {
+          emailFeedback.textContent = isAvailable ? " Email is available" : " Email already exists";
+          emailFeedback.style.color = isAvailable ? "green" : "red";
+        }
+        if (isAvailable) {
+          emailInput.classList.remove("error-border");
+          emailInput.classList.add("valid-border");
+        } else {
+          emailInput.classList.add("error-border");
+          emailInput.classList.remove("valid-border");
+        }
+      })
+      .catch(err => {
+        console.error("Error checking email availability:", err);
+      });
+  });
+
+  // 4. Phone Live Validation
+  phoneInput?.addEventListener("input", function () {
+    const phone = this.value.trim();
+    if (!phone) {
+      if (phoneFeedback) phoneFeedback.textContent = "";
+      this.classList.remove("error-border", "valid-border");
+      return;
+    }
+
+    const phoneRegex = /^[0-9]{5,15}$/;
+    if (!phoneRegex.test(phone)) {
+      if (phoneFeedback) {
+        phoneFeedback.textContent = " Phone must be 5–15 digits";
+        phoneFeedback.style.color = "red";
+      }
+      this.classList.add("error-border");
+      this.classList.remove("valid-border");
+    } else {
+      if (phoneFeedback) {
+        phoneFeedback.textContent = " Valid phone number";
+        phoneFeedback.style.color = "green";
+      }
+      this.classList.remove("error-border");
+      this.classList.add("valid-border");
+    }
+  });
+
+  // 5. Password Strength Validation
+  function checkPasswordStrength() {
+    if (!pwd || !pwdStrengthFeedback) return true;
+
+    const val = pwd.value;
+    if (!val) {
+      pwdStrengthFeedback.textContent = "";
+      pwd.classList.remove("error-border", "valid-border");
+      return false;
+    }
+
+    // Step 1: Weak check (length < 6)
+    if (val.length < 6) {
+      pwdStrengthFeedback.textContent = "Password strength: Weak (at least 6 characters required)";
+      pwdStrengthFeedback.style.color = "red";
+      pwd.classList.add("error-border");
+      pwd.classList.remove("valid-border");
+      return false;
+    }
+
+    // Step 2: Strong check (letters + digits + special char)
+    const strongRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?^&]).{6,}$/;
+    if (strongRegex.test(val)) {
+      pwdStrengthFeedback.textContent = "Password strength: Strong";
+      pwdStrengthFeedback.style.color = "green";
+      pwd.classList.remove("error-border");
+      pwd.classList.add("valid-border");
+      return true;
+    }
+
+    // Step 3: Medium check (letters + digits)
+    const mediumRegex = /^(?=.*[A-Za-z])(?=.*\d).{4,}$/;
+    if (mediumRegex.test(val)) {
+      pwdStrengthFeedback.textContent = "Password strength: Medium (add a special character for stronger security)";
+      pwdStrengthFeedback.style.color = "orange";
+      pwd.classList.remove("error-border");
+      pwd.classList.add("valid-border");
+      return true;
+    }
+
+    // Fallback
+    pwdStrengthFeedback.textContent = "Password strength: Weak (missing required characters)";
+    pwdStrengthFeedback.style.color = "red";
+    pwd.classList.add("error-border");
+    pwd.classList.remove("valid-border");
+    return false;
+  }
+
+  // 6. Confirm Password Matching Validation
+  function checkPasswordMatch() {
+    if (!confirmPwd || !pwd) return true;
+    if (!confirmPwd.value) {
+      confirmPwd.classList.remove("error-border", "valid-border");
+      if (confirmFeedback) confirmFeedback.textContent = "";
+      confirmPwd.setCustomValidity("");
+      return true;
+    }
+    if (pwd.value !== confirmPwd.value) {
+      confirmPwd.classList.add("error-border");
+      confirmPwd.classList.remove("valid-border");
+      if (confirmFeedback) {
+        confirmFeedback.textContent = " Passwords do not match!";
+        confirmFeedback.style.color = "red";
+      }
+      confirmPwd.setCustomValidity("Passwords do not match!");
+      return false;
+    } else {
+      confirmPwd.classList.remove("error-border");
+      confirmPwd.classList.add("valid-border");
+      if (confirmFeedback) {
+        confirmFeedback.textContent = " Passwords match";
+        confirmFeedback.style.color = "green";
+      }
+      confirmPwd.setCustomValidity("");
+      return true;
+    }
+  }
+
+  pwd?.addEventListener("input", function () {
+    checkPasswordStrength();
+    checkPasswordMatch();
+  });
+  confirmPwd?.addEventListener("input", checkPasswordMatch);
+
+  // Submit Handler
+  document.getElementById("signupForm")?.addEventListener("submit", function (e) {
+    let isValid = true;
+
+    if (!checkPasswordMatch()) {
+      isValid = false;
+      confirmPwd?.reportValidity();
+    }
+
+    if (pwd && pwd.value.length < 6) {
+      isValid = false;
+      checkPasswordStrength();
+    }
+
+    if (!isEmailAvailable) {
+      isValid = false;
+      if (emailFeedback && emailFeedback.textContent.includes("already exists")) {
+        alert("Please enter a different email address as this one is already registered.");
+      }
+    }
+
+    if (!isValid) {
+      e.preventDefault();
+    }
+  });
+</script>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Signup Success -->
+<div th:fragment="signupSuccessAlert" th:if="${signupSuccess}" class="alert alert-success">
+    <span th:text="${signupSuccess}"></span>
+</div>
+
+<!-- Signup Error -->
+<div th:fragment="signupErrorAlert" th:if="${signupError}" class="alert alert-danger">
+    <span th:text="${signupError}"></span>
+</div>
+
+<!-- Login Success -->
+<div th:fragment="loginSuccessAlert" th:if="${loginSuccess}" class="alert alert-success">
+    <span th:text="${loginSuccess}"></span>
+</div>
+</body>
+</html>
+setTimeout(function() {
+document.querySelectorAll('.alert-top-right').forEach(function(alertBox) {
+alertBox.style.transition = "opacity 0.5s ease";
+alertBox.style.opacity = "0";
+setTimeout(function() { alertBox.style.display = "none"; }, 500);
+});
+}, 2000);
+

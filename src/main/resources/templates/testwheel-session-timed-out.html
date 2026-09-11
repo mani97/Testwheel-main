@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>
+   TestWheel - Session Timed Out
+  </title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+ <link th:href="@{/assets/css/common-styles.css}" rel="stylesheet">
+  <link th:href="@{assets/css/login-styles.css}" rel="stylesheet">
+  <link th:href="@{assets/css/error-styles.css}" rel="stylesheet">
+  <link th:href="@{assets/css/bootstrap.min.css}" rel="stylesheet">
+  <link th:href="@{assets/fontawesome/css/all.min.css}" rel="stylesheet">
+  <script th:src="@{assets/js/jquery.min.js}"></script>
+  <script th:src="@{assets/js/bootstrap.bundle.min.js}"></script>
+  
+</head>
+
+<body>
+
+<div class="layout">
+  <!-- Header -->  
+<header class="fixed-top py-0 px-3 px-sm-4 box-shadow bg-white scrolled">  
+  <nav class="navbar navbar-expand-lg justify-content-between py-0">
+        <div class="container-fluid container-xxl justify-content-between px-0 p-tb-11">
+          <a class="navbar-brand col-auto me-0 py-0" href="https://www.testwheel.com/">
+              <img loading="lazy" src="https://d1dn83zl6bhqp.cloudfront.net/images/logo.svg" alt="TestWheel Logo">
+          </a>       
+         <div class="d-flex"> 
+           <div class="d-md-flex mt-lg-0 d-grid d-none d-lg-none">
+        <a th:href="@{/login}" class="dmsans-medium py-2 ps-4 text-center button-f1 me-4 me-xl-4 me-lg-2 mb-1 mb-md-0 lgn-btn-hvr" id="login_button">Login</a><a href="https://app.testwheel.com/signup" class="btn btn-blue btn-border-r dmsans-medium py-2 px-4 button-f1 btn-w-200 btn-shine btn-shdw" id="register_button">Start Free Trial</a>
+              </div>      
+          <button class="navbar-toggler collapsed ms-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="toggler-icon top-bar"></span> <span class="toggler-icon middle-bar"></span> <span class="toggler-icon bottom-bar"></span>
+          </button>
+</div>
+          <div class="collapse navbar-collapse justify-content-end pt-3 pt-lg-0 p-b-72-r" id="navbarContent">
+              
+              <div class="d-lg-flex mt-lg-0 d-grid d-md-none">
+                <a th:href="@{/login}" class="dmsans-medium py-2 ps-4 text-center button-f1 me-4 me-xl-4 me-lg-2 mb-1 mb-md-0 lgn-btn-hvr">Login</a>
+                <a href="https://app.testwheel.com/signup" class="btn btn-blue btn-border-r dmsans-medium py-2 px-4 button-f1 btn-w-200 btn-shine btn-shdw">Start Free Trial</a>
+              </div>             
+          </div>
+        </div>
+      </nav>
+    </header>
+  <!-- end of header -->
+
+  <!-- body content -->
+ <div class="body-content">
+    <section class="p-t-36 p-b-56">
+      <div class="container-fluid container-xxl">
+        <div class="row justify-content-center">
+          <div class="text-center">
+              <img class="timeout-img mw-100" src="https://d1dn83zl6bhqp.cloudfront.net/images/time-out.svg" alt="404 Error">
+              <h1 class="head-h2 text-color1 dmsans-semibold mb-0">Session Timed Out</h1>
+              <p class="text-center text-color1 dmsans-semibold para-f2 m-t-16 px-r-0">This may have occurred due to one of the following reasons</p>
+              <div class="col-sm-9 col-md-8 col-lg-7 col-xl-5 col-xxl-4 text-start para-f3 mx-auto">
+                <ul class="list-styled ms-3 ms-sm-5 ps-lg-5 ps-xxl-0">
+                  <li class="m-t-10 text-color1">Inactivity for more than&nbsp;30 minutes</li>
+                  <li class="m-t-10 text-color1">Attempt to open browser developer tools (security policy)</li>
+                  <li class="m-t-10 text-color1">Multiple active sessions detected for the same user</li>
+                  <li class="m-t-10 text-color1">Session cleared due to security cleanup or timeout</li>
+                  <li class="m-t-10 text-color1">Scheduled maintenance or forced logout by admin</li>
+                </ul>
+              </div>
+              <p class="text-center text-color1 dmsans-semibold para-f3 m-t-24 m-b-16 px-r-0">Log in again to continue your works</p>
+              <div class="text-center"><a th:href="@{/login}" class="btn btn-blue btn-border-r btn-w-200 py-2 button-f1 px-4 fs-18">Login</a></div>
+          </div>        
+        </div>
+      </div>
+    </section>
+</div>
+
+<footer class="footer p-t-108 px-3 px-sm-4">
+      <div class="container-fluid container-xxl justify-content-xxl-between px-0">
+        <div class="row d-flex justify-content-xxl-between m-b-56">  
+         <div class="col-12 col-xl-2 col-xxl-3 mb-3 mb-lg-0">
+          <a class="navbar-brand col-auto me-0 py-0" href="https://www.testwheel.com/">
+            <img src="https://d1dn83zl6bhqp.cloudfront.net/images/logo.svg" alt="TestWheel Logo">
+        </a>
+              <p class="dmsans-semibold para-f4 text-color1 mt-4 m-b-8">Follow Us</p>
+              <ul class="list-unstyled mb-0">
+                <li><a href="https://www.facebook.com/testwheelglobal/" target="_blank"><img decoding="async" src="https://d1dn83zl6bhqp.cloudfront.net/images/fb-icon.svg" alt="Facebook Icon" class="me-2"></a>
+                    <a href="https://www.youtube.com/@TestWheel/" target="_blank"><img decoding="async" src="https://d1dn83zl6bhqp.cloudfront.net/images/yt-icon.svg" alt="youtube Icon" class="me-2"></a>
+                    <a href="https://www.linkedin.com/company/testwheel-official/" target="_blank"><img decoding="async" src="https://d1dn83zl6bhqp.cloudfront.net/images/li-icon.svg" alt="linkedin Icon" class="me-2"></a>                    
+                    <a href="https://www.instagram.com/testwheel_official/" target="_blank"><img decoding="async" src="https://d1dn83zl6bhqp.cloudfront.net/images/in-icon.svg" alt="instagram Icon" class="me-2"></a>                
+                    <a href="https://twitter.com/TestWheel_Off" target="_blank"><img decoding="async" src="https://d1dn83zl6bhqp.cloudfront.net/images/x-icon.svg" alt="twitter Icon"></a></li>
+              </ul>
+              <a class="btn btn-outline btn-border-r text-color1 py-1 mt-4 px-3 fs-18 dmsans-medium" href="https://www.testwheel.com/contact-us" role="button">Contact Us</a>
+          </div>      
+          <div class="col-12 col-xl-9 mb-xl-3 ms-xl-auto pt-4 pt-xl-0">
+            <div class="row d-flex justify-content-xl-between underline">
+              <div class="col-sm-6 col-lg-4 col-xl-auto mb-2 mb-xl-0">
+                  <p class="dmsans-semibold para-f4 text-color1 mb-3">Platform</p>
+                  <ul class="list-unstyled">
+                    <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/web-testing">Web Testing</a></li>
+                    <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/api-testing">API Testing</a></li>
+                    <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/mobile-testing">Mobile Testing</a></li>
+          <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/desktop-testing">Desktop Testing</a></li>
+                    <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/performance-testing">Performance/Load Testing</a></li>
+                    <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/security-testing">Security Testing</a></li>
+                  </ul>
+              </div>
+              <div class="col-sm-6 col-lg-4 col-xl-auto mb-2 mb-xl-0">
+                  <p class="dmsans-semibold para-f4 text-color1 mb-3">Solutions</p>
+                  <ul class="list-unstyled">
+                    <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/ai-test-automation">AI Test Automation</a></li>
+                    <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/devops-integrations">DevOps Integration</a></li>
+                    <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/government-solutions">Government Solutions</a></li>
+          <li class="fw-normal para-f4 text-color1 mb-2 mb-xl-0"><a href="https://www.testwheel.com/selenium-ai-automation">Selenium to AI Automation</a></li>
+                  </ul>
+              </div>
+              <div class="col-sm-6 col-lg-4 col-xl-auto mb-2 mb-xl-0">
+                <p class="dmsans-semibold para-f4 text-color1 mb-3">Learn</p>
+                <ul class="list-unstyled">
+                  <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/blog">Blog</a></li>
+                  <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/newsletter">Newsletter</a></li>
+                  <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/webinars">Webinar</a></li>
+                  <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/testwheel-recorder">TestWheel Recorder</a></li>
+          <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://docs.testwheel.com/">TestWheel Docs</a></li>
+                </ul>
+              </div>
+              <div class="col-sm-6 col-lg-4 col-xl-auto mb-2 mb-xl-0">
+                 <p class="dmsans-semibold para-f4 text-color1 mb-3">Product Insights</p>
+                <ul class="list-unstyled">
+                  <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/price-list">Pricing</a></li>
+                  <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/about">About</a></li>
+                  <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/faq">FAQ</a></li>
+                  <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/case-studies">Case Studies</a></li>
+                  <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/how-it-works">How It Works</a></li>
+          <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/product-sheet">Product Sheet</a></li>
+                </ul>
+              </div> 
+              <div class="col-sm-6 col-lg-4 col-xl-auto">
+                <p class="dmsans-semibold para-f4 text-color1 mb-3">Comparison</p>
+                <ul class="list-unstyled">
+                 <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/comparison/testwheel-vs-tricentis/">TestWheel Vs Tricentis</a></li>
+         <li class="fw-normal para-f4 text-color1 mb-2"><a href="https://www.testwheel.com/comparison/testwheel-vs-katalon/">TestWheel Vs Katalon</a></li>
+                </ul>
+              </div>
+              <!-- <div class="col-sm-6 col-md-4 col-lg-auto pt-4">
+                <p class="dmsans-semibold fs-14 text-color1">Pricing</p>
+                <ul class="list-unstyled">
+                  <li><a href="https://www.testwheel.com/price-list">TestWheel Plans</a></li>
+                  
+                </ul>
+              </div>  -->           
+            </div>        
+          </div>
+        </div>
+        <div class="row top-border pt-4">
+          <div class="col-12 col-md-auto">
+            <p class="text-start mb-0 para-f4 text-color1 fw-normal mb-2">Copyright © 2026 <a class="text-decoration-none" href="https://www.yakshnacorp.com/" target="_blank">Yakshna Corporation</a>. All rights reserved.</p>
+          </div>
+          <div class="col-12 col-lg-auto ms-lg-auto underline">
+              <ul class="list-unstyled mb-0 d-sm-flex">
+                <li class="mt-lg-0 para-f4 text-color1 fw-normal mb-2"><a href="https://www.testwheel.com/privacy-policy">Privacy &amp; Policy</a></li>
+                <!-- <li class="ms-sm-4 mt-lg-0"><a href="https://www.testwheel.com/faq">FAQ</a></li> -->
+                <li class="ms-sm-4 mt-lg-0 para-f4 text-color1 fw-normal mb-2"><a href="https://www.testwheel.com/terms-conditions">Terms and Conditions</a></li>
+                <li class="ms-sm-4 mt-lg-0 para-f4 text-color1 fw-normal mb-2"><a href="https://www.testwheel.com/sitemap">SiteMap</a></li>
+              </ul>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+</div>
+<!-- end of layout -->
+
+<!--<script th:src="@{/assets/js/animation-aos.js}"></script>-->
+<script th:src="@{/assets/js/tw-scripts.js}"></script>
+
+</body>
+
+
+</html>

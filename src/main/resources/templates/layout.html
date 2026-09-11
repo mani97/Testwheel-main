@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <title>
+    TestWheel - Layout
+  </title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link th:href="@{assets/css/common-styles.css}" rel="stylesheet">
+  <link th:href="@{assets/css/login-styles.css}" rel="stylesheet">
+  <link th:href="@{assets/css/after-login-styles.css}" rel="stylesheet">
+  <link th:href="@{assets/css/bootstrap.min.css}" rel="stylesheet">
+  <link th:href="@{assets/fontawesome/css/all.min.css}" rel="stylesheet">
+</head>
+
+<body>
+  <!-- HEADER -->
+  <div class="header p-t-12 p-b-12">
+    <div class="d-flex align-items-center gap-3 gap-lg-5">
+      <!-- MOBILE BUTTON -->
+      <button class="btn btn-outline-light btn-sm d-lg-none" id="mobileToggle">
+        <i class="fa-solid fa-bars text-color1"></i>
+      </button>
+      <div class="mb-0"><img loading="lazy" th:src="@{assets/images/logo.svg}" alt="TestWheel Logo" width="149px"
+          height="42px"></div>
+      <div class="dropdown d-md-block d-none">
+        <div class="btn-drpdwn text-color1 para-f4 dmsans-semibold p-tb-10 p-lr-16" data-bs-toggle="dropdown">
+          TestWheel<i class="fa-solid fa-chevron-down ps-3"></i>
+        </div>
+        <div class="dropdown-menu w-320  py-0 custom-dropdown">
+          <div class="d-flex justify-content-between pe-4 ps-2 brdr-btm-1 py-3">
+            <div class="col-sm-6">
+              <p class="para-f3 dmsans-semibold px-2 text-color1">Your Projects</p>
+            </div>
+            <div class="col-sm-6 text-end">
+              <div class="para-f3 text-color3 dmsans-semibold"><a href="">View All</a></div>
+            </div>
+          </div>
+          <div class="dropdown-scroll overflow-y-auto">
+            <ul>
+              <li class="px-2 p-t-16 p-b-8">
+                <a class="dropdown-item d-flex justify-content-between" th:href="@{/layout}">
+                  <span>
+                    <p class="dmsans-semibold text-color1">TestWheel</p>
+                    <p class="text-color4 para-f4">Created by Prakash</p>
+                  </span>
+                  <span><img th:src="@{assets/images/project-check-icon.svg}" alt="icon"></span></a>
+              </li>
+              <li class="px-2 p-t-8 p-b-8"><a class="dropdown-item dmsans-semibold text-color1" href="#"><span>
+                    <p class="dmsans-semibold text-color1">E-commerce Suite</p>
+                    <p class="text-color4 para-f4">Created by Prakash</p>
+                  </span></a></li>
+              <li class="px-2 p-t-8 p-b-8"><a class="dropdown-item dmsans-semibold text-color1" href="#"><span>
+                    <p class="dmsans-semibold text-color1">API test</p>
+                    <p class="text-color4 para-f4">Created by Prakash</p>
+                  </span></a></li>
+
+            </ul>
+          </div>
+          <div class="px-2 p-t-12 p-b-24"><a
+              class="btn btn-create p-tb-12 p-lr-16 text-white d-md-block d-none button-f2" data-bs-toggle="modal"
+              data-bs-target="#newProject"><img th:src="@{assets/images/create-test-icon.svg}" alt="Icon"
+                class="pe-2">Create Project</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-4">
+      <a class="btn btn-create p-tb-12 p-lr-16 text-white d-md-block d-none button-f2"><img
+          th:src="@{assets/images/create-test-icon.svg}" alt="Icon" class="pe-2" /> Create Test</a>
+      <div class="dropdown">
+        <div class="ps-2 ps-md-0 py-2 text-color1 notification" data-bs-toggle="dropdown">
+          <!-- <i class="fa-regular fa-bell fs-4"></i> -->
+          <img th:src="@{assets/images/bell-icon.svg}" alt="icon" />
+          <span class="badge-dot"></span>
+        </div>
+        <div class="dropdown-menu w-420 py-0 custom-dropdown">
+          <div class="d-flex justify-content-between px-4 brdr-btm-1 py-3">
+            <div class="col-sm-6">
+              <p class="para-f3 dmsans-semibold text-color1">Notifications <span class="badge badge-circle">2</span></p>
+            </div>
+            <div class="col-sm-6 text-end">
+              <p class="para-f3 text-color3 dmsans-semibold"><a href="">Mark all as read</a></p>
+            </div>
+          </div>
+          <div class="brdr-btm-1 d-flex bg-color2 p-3">
+            <div class="col-auto"><img th:src="@{assets/images/test-execution.svg}" alt="Icon" /></div>
+            <div class="col-11">
+              <p class="para-f4 dmsans-semibold px-3 text-color1">Test Execution Complete<span
+                  class="dot bg-color3 ms-1 mt-2"></span></p>
+              <p class="para-f4 px-3 text-color6">Your web test 'Login Flow' completed successfully</p>
+              <p class="para-f4 px-3 text-color6">1 minutes ago</p>
+            </div>
+          </div>
+          <div class="brdr-btm-1 d-flex bg-color2 px-3 py-3">
+            <div class="col-auto"><img th:src="@{assets/images/new-team.svg}" alt="Icon" /></div>
+            <div class="col-11">
+              <p class="para-f4 dmsans-semibold px-3 text-color1">New Team Member<span
+                  class="dot bg-color3 ms-1 mt-2"></span></p>
+              <p class="para-f4 px-3 text-color6">John Doe joined your team</p>
+              <p class="para-f4 px-3 text-color6">1 hours ago</p>
+            </div>
+          </div>
+          <div class="py-3 px-3"><a class="dropdown-item text-color3 dmsans-semibold text-center" href="#">View all
+              notifications</a></div>
+        </div>
+      </div>
+      <div class="dropdown">
+        <!-- <img src="assets/images/profile-img.svg" class="rounded-circle cursor-pointer" > -->
+        <div class="profile-avatar" data-bs-toggle="dropdown">
+          SJ
+        </div>
+        <div class="dropdown-menu dropdown-menu-end w-320 pb-0 custom-dropdown">
+          <div class="d-flex brdr-btm-1 p-3">
+            <div class="col-auto">
+              <div class="profile-avatar">
+                SJ
+              </div>
+            </div>
+            <div class="col-11">
+              <p class="para-f4 dmsans-semibold px-3 text-color1">Alex Rivest</p>
+              <p class="para-f4 px-3 text-color6">alex.rivest@testwheel.com</p>
+            </div>
+          </div>
+          <ul>
+            <li class="pb-2 mt-3 px-2"><a class="dropdown-item dmsans-semibold text-color1" href="#"><img
+                  th:src="@{assets/images/profile-icon.svg}" alt="View Profile" class="pe-3" />View Profile</a></li>
+            <li class="py-2 px-2"><a class="dropdown-item dmsans-semibold text-color1" href="#"><img
+                  th:src="@{assets/images/setting-icon.svg}" alt="Account Settings" class="pe-3" />Account Settings</a>
+            </li>
+            <li class="py-2 px-2"><a class="dropdown-item dmsans-semibold text-color1" href="#"><img
+                  th:src="@{assets/images/billing-icon.svg}" alt="Billing & Plans" class="pe-3" />Billing & Plans</a>
+            </li>
+            <li class="py-2 mb-3 px-2"><a class="dropdown-item dmsans-semibold text-color1" href="#"><img
+                  th:src="@{assets/images/help-support-icon.svg}" alt="Help & Support" class="pe-3" />Help & Support</a>
+            </li>
+            <li class="brdr-top-1 py-3 px-2"><a class="dropdown-item text-color8 dmsans-semibold"
+                th:href="@{/logout}"><img th:src="@{assets/images/logout-icon.svg}" alt="Sign Out" class="pe-3" />Sign
+                Out</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- SIDEBAR -->
+  <div class="sidebar pt-2" id="sidebar">
+    <div class="toggle-btn d-none d-lg-block text-color1 mt-3" id="toggleBtn">
+      <!-- <i class="fa-solid fa-chevron-left"></i> -->
+      <i class="fa-solid fa-angles-left"></i>
+    </div>
+    <div class="d-md-none p-3 border-bottom border-secondary">
+      <!-- <button class="btn btn-create px-4 py-2 text-white w-100 mb-2">
+      <i class="fa-solid fa-plus pe-2"></i> Create Test
+    </button> -->
+      <a class="btn btn-create p-tb-12 p-lr-16 text-white button-f2 w-100 mb-2"><img
+          th:src="@{assets/images/create-test-icon.svg}" alt="Icon" class="pe-2" /> Create Test</a>
+      <div class="dropdown w-100">
+        <div class="btn-drpdwn text-color1 w-100 d-flex justify-content-between p-tb-10 p-lr-16"
+          data-bs-toggle="dropdown">
+          TestWheel<i class="fa-solid fa-chevron-down ps-3"></i>
+        </div>
+        <div class="dropdown-menu w-100 custom-dropdown">
+          <div class="d-flex justify-content-between px-4 brdr-btm-1 py-2">
+            <div class="col-sm-6 align-self-center">
+              <p class="para-f3 dmsans-semibold px-2 text-color1">Your Projects</p>
+            </div>
+            <div class="col-sm-6 text-end">
+              <div class="para-f3 text-color3 dmsans-semibold"><a href="">View All</a></div>
+            </div>
+          </div>
+          <div class="dropdown-scroll overflow-y-auto">
+            <ul>
+              <li class="px-2 p-t-16 p-b-8">
+                <a class="dropdown-item d-flex justify-content-between" href="#">
+                  <span>
+                    <p class="dmsans-semibold text-color1">TestWheel</p>
+                    <p class="text-color4 para-f4">Created by Prakash</p>
+                  </span>
+                  <span><img th:src="@{assets/images/project-check-icon.svg}" alt="icon"></span></a>
+              </li>
+              <li class="px-2 p-t-8 p-b-8"><a class="dropdown-item dmsans-semibold text-color1" href="#"><span>
+                    <p class="dmsans-semibold text-color1">E-commerce Suite</p>
+                    <p class="text-color4 para-f4">Created by Prakash</p>
+                  </span></a></li>
+              <li class="px-2 p-t-8 p-b-8"><a class="dropdown-item dmsans-semibold text-color1" href="#"><span>
+                    <p class="dmsans-semibold text-color1">API test</p>
+                    <p class="text-color4 para-f4">Created by Prakash</p>
+                  </span></a></li>
+
+            </ul>
+          </div>
+          <div class="py-3 px-sm-2"><a class="btn btn-create p-tb-12 p-lr-16 text-white button-f2"
+              data-bs-toggle="modal" data-bs-target="#newProject"><img th:src="@{assets/images/create-test-icon.svg}"
+                alt="Icon" class="pe-2">Create Project</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="px-3 sidebar-menu">
+      <ul class="menu">
+        <!-- <div class="m-t-36 mb-1"><p class="text-color5 sidebar-head para-f4 dmsans-semibold">Home</p></div> -->
+        <li class="m-t-36">
+          <a th:href="@{/dashboard}" class="active"><span class="d-flex">
+              <img loading="lazy" th:src="@{assets/images/dashboard-icon.svg}" alt="Dashboard"
+                class="p-r-12 image-default">
+              <img loading="lazy" th:src="@{assets/images/dashboard-icon-active.svg}" alt="Dashboard"
+                class="p-r-12 image-active">
+              <span class="menu-text para-f3 align-self-center">Dashboard</span></span></a>
+        </li>
+        <li class="menu-item m-t-16">
+          <a href="#" class="menu-link"><span class="d-flex">
+              <img loading="lazy" th:src="@{assets/images/all-tests-icon.svg}" alt="All Tests"
+                class="p-r-12 image-default">
+              <img loading="lazy" th:src="@{assets/images/all-tests-icon-active.svg}" alt="All Tests"
+                class="p-r-12 image-active">
+              <span class="menu-text para-f3 align-self-center">All Tests</span></span><i
+              class="fa-solid fa-chevron-down drpdwn-icon menu-text"></i></a>
+          <ul class="submenu">
+            <li><a th:href="@{/create-testcase}" class="menu-text p-t-12 pb-0 para-f3">API Testing</a></li>
+            <li><a th:href="@{/create-testcase}" class="menu-text p-t-12 pb-0 para-f3">Mobile Testing</a></li>
+            <li><a th:href="@{/create-testcase}" class="menu-text p-t-12 pb-0 para-f3">Web Testing</a></li>
+          </ul>
+        </li>
+        <!-- <div class="m-t-16 mb-1"><p class="text-color5 sidebar-head para-f4 dmsans-semibold">Testing</p></div> -->
+
+        <li class="m-t-16">
+          <a th:href="@{/createtest}"><span class="d-flex">
+              <img loading="lazy" th:src="@{assets/images/create-tests-icon.svg}" alt="Create Tests"
+                class="p-r-12 image-default">
+              <img loading="lazy" th:src="@{assets/images/create-tests-icon-active.svg}" alt="Create Tests"
+                class="p-r-12 image-active">
+              <span class="menu-text para-f3 align-self-center">Create Test</span></span></a>
+        </li>
+        <li class="m-t-16">
+          <a th:href="@{/testlist}"><span class="d-flex">
+              <img loading="lazy" th:src="@{assets/images/test-list-icon.svg}" alt="Test List"
+                class="p-r-12 image-default">
+              <img loading="lazy" th:src="@{assets/images/test-list-icon-active.svg}" alt="Test List"
+                class="p-r-12 image-active">
+              <span class="menu-text para-f3 align-self-center">Test List</span></span></a>
+        </li>
+        <!-- <div class="m-t-16 mb-1"><p class="text-color5 sidebar-head para-f4 dmsans-semibold">Reports</p></div> -->
+        <li class="m-t-16">
+          <a href="#"><span class="d-flex">
+              <img loading="lazy" th:src="@{assets/images/test-report-icon.svg}" alt="Test Reports"
+                class="p-r-12 image-default">
+              <img loading="lazy" th:src="@{assets/images/test-report-icon-active.svg}" alt="Test Reports"
+                class="p-r-12 image-active">
+              <span class="menu-text para-f3 align-self-center">Test Reports</span></span></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- BACKDROP -->
+  <div id="backdrop"></div>
+  <!-- CONTENT -->
+  <div class="content" id="content">
+  </div>
+  <div class="modal fade" id="videoModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content position-relative">
+        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
+        <div class="modal-body p-0 position-relative">
+          <div class="media-box" id="mediaBox"><img id="thumb" th:src="@{assets/images/video-img.webp}"
+              class="img-fluid">
+            <p></p>
+            <div class="play-button" id="playIcon"><span><img decoding="async"
+                  src="https://d1dn83zl6bhqp.cloudfront.net/images/iframe-play.svg"></span><span
+                class="play-text">Play</span></div>
+            <div><iframe id="videoFrame" class="w-100" height="338" src="" allow="autoplay; encrypted-media"
+                allowfullscreen=""> </iframe></div>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-center gap-3">
+          <!-- <div class="row m-t-36 justify-content-center"> -->
+          <div class="col-sm-5 col-5 col-lg-4">
+            <a th:href="@{/welcome}" type="button"
+              class="btn btn-border-bg dmsans-semibold w-100 px-lg-4 p-t-12 p-b-12 text-color1 button-f1">
+              Skip
+            </a>
+          </div>
+          <div class="col-sm-5 col-lg-4">
+            <a type="button"
+              class="btn btn-create dmsans-semibold w-100 px-lg-4 p-t-12 p-b-12 text-white button-f1 icon-hover"
+              th:href="@{/welcome}">
+              <span class="icon-hover">Take a Tour <i class="fa-solid fa-arrow-right ps-1"></i></span>
+            </a>
+          </div>
+          <!-- </div> -->
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <script th:src="@{assets/js/tw-scripts.js}"></script>
+  <script th:src="@{assets/js/jquery.min.js}"></script>
+  <script th:src="@{assets/js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>
