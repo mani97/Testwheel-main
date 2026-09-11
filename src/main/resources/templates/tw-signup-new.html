@@ -74,7 +74,7 @@
                       <div class="col-md-6 m-b-24">
                         <label for="fname" class="form-label label-fnt dmsans-medium">First Name*</label>
                         <input type="text" th:field="*{firstName}" class="form-control input-bg"
-                          placeholder="Enter First Name" id="fname" required>
+                          placeholder="Enter First Name" id="fname">
                         <small id="fnameFeedback" class="d-block m-t-5"></small>
                         <small th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"
                           style="color:red; font-weight:bold;"></small>
@@ -83,7 +83,7 @@
                       <div class="col-md-6 m-b-24">
                         <label for="lname" class="form-label label-fnt dmsans-medium">Last name*</label>
                         <input type="text" th:field="*{lastName}" class="form-control input-bg"
-                          placeholder="Enter Last Name" id="lname" required>
+                          placeholder="Enter Last Name" id="lname">
                         <small id="lnameFeedback" class="d-block m-t-5"></small>
                         <small th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"
                           style="color:red; font-weight:bold;"></small>
@@ -94,7 +94,7 @@
                       <div class="col-md-12 m-b-24">
                         <label for="email" class="form-label label-fnt dmsans-medium">Business email*</label>
                         <input type="email" th:field="*{username}" class="form-control input-bg"
-                          placeholder="ex. email@domain.com" id="email" required>
+                          placeholder="ex. email@domain.com" id="email">
                         <small id="usernameFeedback" class="d-block m-t-5"></small>
                         <small th:if="${#fields.hasErrors('username')}" th:errors="*{username}"
                           style="color:red; font-weight:bold;"></small>
@@ -126,7 +126,7 @@
                         <label for="password" class="form-label label-fnt dmsans-medium">Password*</label>
                         <div class="input-group bg-color1">
                           <input type="password" class="form-control input-bg" placeholder="Enter Password"
-                            id="password" th:field="*{password}" required minlength="6">
+                            id="password" th:field="*{password}">
                           <i class="fa-solid toggle-password-eye text-color1 fa-eye" id="togglePassword"
                             style="cursor: pointer;"></i>
                         </div>
@@ -142,7 +142,7 @@
                           Password*</label>
                         <div class="input-group bg-color1">
                           <input type="password" class="form-control input-bg" placeholder="Confirm Password"
-                            id="confirmPassword" th:field="*{confirmPassword}" required>
+                            id="confirmPassword" th:field="*{confirmPassword}">
                           <i class="fa-solid toggle-password-eye text-color1 fa-eye" id="togglePassword1"
                             style="cursor: pointer;"></i>
                         </div>
@@ -315,79 +315,133 @@
 
   // 3. Email Live Validation & Availability Check
   let isEmailAvailable = true;
+  let emailCheckPending = false;
+  let emailCheckRequest = 0;
   emailInput?.addEventListener("input", function () {
+
     const email = this.value.trim();
+    const currentRequest = ++emailCheckRequest;
 
+    // Empty
     if (!email) {
-      if (emailFeedback) {
-        emailFeedback.textContent = " Email is required";
-        emailFeedback.style.color = "red";
-      }
-      this.classList.add("error-border");
-      this.classList.remove("valid-border");
+      emailFeedback.textContent = "Email is required";
+      emailFeedback.style.color = "red";
+
+      emailInput.classList.add("error-border");
+      emailInput.classList.remove("valid-border");
+
       isEmailAvailable = false;
+      emailCheckPending = false;
       return;
     }
 
+    // Invalid format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!emailRegex.test(email)) {
-      if (emailFeedback) {
-        emailFeedback.textContent = " Invalid email format";
-        emailFeedback.style.color = "red";
-      }
-      this.classList.add("error-border");
-      this.classList.remove("valid-border");
+      emailFeedback.textContent = "Invalid email format";
+      emailFeedback.style.color = "red";
+
+      emailInput.classList.add("error-border");
+      emailInput.classList.remove("valid-border");
+
       isEmailAvailable = false;
+      emailCheckPending = false;
       return;
     }
+
+    // Start checking
+    emailCheckPending = true;
+    isEmailAvailable = false;
+
+    emailFeedback.textContent = "Checking email availability...";
+    emailFeedback.style.color = "orange";
+
+    emailInput.classList.add("error-border");
+    emailInput.classList.remove("valid-border");
 
     fetch(`/check-email?email=${encodeURIComponent(email)}`)
-      .then(res => res.json())
-      .then(isAvailable => {
-        isEmailAvailable = isAvailable;
-        if (emailFeedback) {
-          emailFeedback.textContent = isAvailable ? " Email is available" : " Email already exists";
-          emailFeedback.style.color = isAvailable ? "green" : "red";
+      .then(response => {
+
+        if (!response.ok) {
+          throw new Error("Email check failed");
         }
+
+        return response.json();
+      })
+      .then(isAvailable => {
+
+        // Ignore old AJAX response
+        if (currentRequest !== emailCheckRequest) {
+          return;
+        }
+
+        emailCheckPending = false;
+        isEmailAvailable = isAvailable;
+
         if (isAvailable) {
+
+          emailFeedback.textContent = "Email is available";
+          emailFeedback.style.color = "green";
+
           emailInput.classList.remove("error-border");
           emailInput.classList.add("valid-border");
+
         } else {
+
+          emailFeedback.textContent =
+            "Email already exists. Please enter a different email address.";
+
+          emailFeedback.style.color = "red";
+
           emailInput.classList.add("error-border");
           emailInput.classList.remove("valid-border");
         }
       })
-      .catch(err => {
-        console.error("Error checking email availability:", err);
+      .catch(error => {
+
+        console.error("Error checking email:", error);
+
+        emailCheckPending = false;
+        isEmailAvailable = false;
+
+        emailFeedback.textContent =
+          "Unable to verify email. Please try again.";
+
+        emailFeedback.style.color = "red";
+
+        emailInput.classList.add("error-border");
+        emailInput.classList.remove("valid-border");
       });
   });
 
-  // 4. Phone Live Validation
-  phoneInput?.addEventListener("input", function () {
-    const phone = this.value.trim();
-    if (!phone) {
-      if (phoneFeedback) phoneFeedback.textContent = "";
-      this.classList.remove("error-border", "valid-border");
-      return;
-    }
 
-    const phoneRegex = /^[0-9]{5,15}$/;
-    if (!phoneRegex.test(phone)) {
-      if (phoneFeedback) {
-        phoneFeedback.textContent = " Phone must be 5–15 digits";
-        phoneFeedback.style.color = "red";
-      }
-      this.classList.add("error-border");
-      this.classList.remove("valid-border");
-    } else {
-      if (phoneFeedback) {
-        phoneFeedback.textContent = " Valid phone number";
-        phoneFeedback.style.color = "green";
-      }
-      this.classList.remove("error-border");
-      this.classList.add("valid-border");
-    }
-  });
+  // // 4. Phone Live Validation
+  // phoneInput?.addEventListener("input", function () {
+  //   const phone = this.value.trim();
+  //   if (!phone) {
+  //     if (phoneFeedback) phoneFeedback.textContent = "";
+  //     this.classList.remove("error-border", "valid-border");
+  //     return;
+  //   }
+
+  //   const phoneRegex = /^[0-9]{5,15}$/;
+  //   if (!phoneRegex.test(phone)) {
+  //     if (phoneFeedback) {
+  //       phoneFeedback.textContent = " Phone must be 5–15 digits";
+  //       phoneFeedback.style.color = "red";
+  //     }
+  //     this.classList.add("error-border");
+  //     this.classList.remove("valid-border");
+  //   } else {
+  //     if (phoneFeedback) {
+  //       phoneFeedback.textContent = " Valid phone number";
+  //       phoneFeedback.style.color = "green";
+  //     }
+  //     this.classList.remove("error-border");
+  //     this.classList.add("valid-border");
+  //   }
+  // });
 
   // 5. Password Strength Validation
   function checkPasswordStrength() {
@@ -453,7 +507,7 @@
         confirmFeedback.textContent = " Passwords do not match!";
         confirmFeedback.style.color = "red";
       }
-      confirmPwd.setCustomValidity("Passwords do not match!");
+      confirmPwd.setCustomValidity("Passwords do not match");
       return false;
     } else {
       confirmPwd.classList.remove("error-border");
@@ -474,28 +528,200 @@
   confirmPwd?.addEventListener("input", checkPasswordMatch);
 
   // Submit Handler
+  // Submit Handler - Validate ALL fields inline
   document.getElementById("signupForm")?.addEventListener("submit", function (e) {
+
     let isValid = true;
 
-    if (!checkPasswordMatch()) {
+    // =========================
+    // First Name
+    // =========================
+    const firstName = fname.value.trim();
+
+    if (!firstName) {
+      fnameFeedback.textContent = "First name is required";
+      fnameFeedback.style.color = "red";
+
+      fname.classList.add("error-border");
+      fname.classList.remove("valid-border");
+
       isValid = false;
-      confirmPwd?.reportValidity();
+    } else {
+      fnameFeedback.textContent = "";
+
+      fname.classList.remove("error-border");
+      fname.classList.add("valid-border");
     }
 
-    if (pwd && pwd.value.length < 6) {
+
+    // =========================
+    // Last Name
+    // =========================
+    const lastName = lname.value.trim();
+
+    if (!lastName) {
+      lnameFeedback.textContent = "Last name is required";
+      lnameFeedback.style.color = "red";
+
+      lname.classList.add("error-border");
+      lname.classList.remove("valid-border");
+
       isValid = false;
-      checkPasswordStrength();
+    } else {
+      lnameFeedback.textContent = "";
+
+      lname.classList.remove("error-border");
+      lname.classList.add("valid-border");
     }
 
-    if (!isEmailAvailable) {
+
+    // =========================
+    // Email
+    // =========================
+    const email = emailInput.value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email) {
+
+      emailFeedback.textContent = "Email is required";
+      emailFeedback.style.color = "red";
+
+      emailInput.classList.add("error-border");
+      emailInput.classList.remove("valid-border");
+
+      isEmailAvailable = false;
       isValid = false;
-      if (emailFeedback && emailFeedback.textContent.includes("already exists")) {
-        alert("Please enter a different email address as this one is already registered.");
-      }
+
+    } else if (!emailRegex.test(email)) {
+
+      emailFeedback.textContent = "Invalid email format";
+      emailFeedback.style.color = "red";
+
+      emailInput.classList.add("error-border");
+      emailInput.classList.remove("valid-border");
+
+      isEmailAvailable = false;
+      isValid = false;
+
+    } else if (emailCheckPending) {
+
+      emailFeedback.textContent = "Checking email availability...";
+      emailFeedback.style.color = "orange";
+
+      emailInput.classList.add("error-border");
+      emailInput.classList.remove("valid-border");
+
+      isValid = false;
+
+    } else if (!isEmailAvailable) {
+
+      emailFeedback.textContent =
+        "Email already exists. Please enter a different email address.";
+
+      emailFeedback.style.color = "red";
+
+      emailInput.classList.add("error-border");
+      emailInput.classList.remove("valid-border");
+
+      isValid = false;
+
+    }
+    // =========================
+    // Phone - Optional
+    // =========================
+    // const phone = phoneInput.value.trim();
+
+    // if (phone) {
+
+    //   const phoneRegex = /^[0-9]{5,15}$/;
+
+    //   if (!phoneRegex.test(phone)) {
+
+    //     phoneFeedback.textContent = "Phone must be 5–15 digits";
+    //     phoneFeedback.style.color = "red";
+
+    //     phoneInput.classList.add("error-border");
+    //     phoneInput.classList.remove("valid-border");
+
+    //     isValid = false;
+
+    //   } else {
+
+    //     phoneFeedback.textContent = "";
+
+    //     phoneInput.classList.remove("error-border");
+    //     phoneInput.classList.add("valid-border");
+    //   }
+
+    // } else {
+
+    //   // Phone is optional
+    //   phoneFeedback.textContent = "";
+    //   phoneInput.classList.remove("error-border", "valid-border");
+    // }
+
+
+    // =========================
+    // Password
+    // =========================
+    if (!pwd.value.trim()) {
+
+      pwdStrengthFeedback.textContent = "Password is required";
+      pwdStrengthFeedback.style.color = "red";
+
+      pwd.classList.add("error-border");
+      pwd.classList.remove("valid-border");
+
+      isValid = false;
+
+    } else if (!checkPasswordStrength()) {
+
+      isValid = false;
     }
 
+
+    // =========================
+    // Confirm Password
+    // =========================
+    if (!confirmPwd.value.trim()) {
+
+      confirmFeedback.textContent = "Confirm password is required";
+      confirmFeedback.style.color = "red";
+
+      confirmPwd.classList.add("error-border");
+      confirmPwd.classList.remove("valid-border");
+
+      //confirmPwd.setCustomValidity("Confirm password is required!");
+
+      isValid = false;
+
+    } else if (!checkPasswordMatch()) {
+
+      isValid = false;
+    }
+
+
+    // =========================
+    // Prevent Submit if Invalid
+    // =========================
     if (!isValid) {
       e.preventDefault();
+
+      // Scroll to first error
+      const firstError = document.querySelector(".error-border");
+
+      if (firstError) {
+        firstError.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+
+        firstError.focus();
+      }
+
+      return false;
     }
+
   });
+
 </script>

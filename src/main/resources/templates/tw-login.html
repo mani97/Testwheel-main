@@ -95,22 +95,34 @@
                                             <i class="fa-solid toggle-password-eye text-color1 fa-eye"
                                                 id="togglePassword"></i>
                                         </div>
-
                                     </div>
+                                    <div>
+                                        <!-- Error should appear BELOW the eye/input group -->
+                                        <small id="passwordError" class="d-block m-t-5"
+                                            style="color: red; font-weight: 500;">
+                                        </small>
+                                    </div>
+
                                 </div>
 
                                 <script>
                                     const togglePassword = document.getElementById("togglePassword");
                                     const passwordField = document.getElementById("passwordField");
 
-                                    togglePassword.addEventListener("click", function () {
-                                        // Switch input type
-                                        const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
-                                        passwordField.setAttribute("type", type);
+                                    togglePassword?.addEventListener("click", function () {
 
-                                        // Toggle eye / eye-slash icon
-                                        this.classList.toggle("fa-eye");
-                                        this.classList.toggle("fa-eye-slash");
+                                        if (passwordField.type === "password") {
+                                            passwordField.type = "text";
+
+                                            this.classList.remove("fa-eye");
+                                            this.classList.add("fa-eye-slash");
+
+                                        } else {
+                                            passwordField.type = "password";
+
+                                            this.classList.remove("fa-eye-slash");
+                                            this.classList.add("fa-eye");
+                                        }
                                     });
                                 </script>
 
@@ -211,6 +223,197 @@
 </body>
 
 </html>
+
+
+<script>
+    const loginForm = document.querySelector('form');
+    const loginEmail = document.querySelector('input[name="username"]');
+    const loginPassword = document.querySelector('input[name="password"]');
+
+    loginForm?.addEventListener("submit", function (e) {
+
+        let isValid = true;
+
+        // Remove previous validation errors
+        document.querySelectorAll(".login-validation-error").forEach(el => el.remove());
+
+        loginEmail?.classList.remove("error-border");
+        loginPassword?.classList.remove("error-border");
+
+        // Email validation
+        if (!loginEmail.value.trim()) {
+
+            e.preventDefault();
+
+            showLoginError(
+                loginEmail,
+                "Email is required"
+            );
+
+            isValid = false;
+
+        } else {
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailRegex.test(loginEmail.value.trim())) {
+
+                e.preventDefault();
+
+                showLoginError(
+                    loginEmail,
+                    "Please enter a valid email address"
+                );
+
+                isValid = false;
+            }
+        }
+
+        // Password validation
+        if (!loginPassword.value.trim()) {
+
+            e.preventDefault();
+
+            showLoginError(
+                loginPassword,
+                "Password is required"
+            );
+
+            if (isValid) {
+                loginPassword.focus();
+            }
+
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            return false;
+        }
+
+        // Valid - allow normal Spring Security submission
+    });
+
+
+    function showLoginError(input, message) {
+
+        input.classList.add("error-border");
+
+        const error = document.createElement("small");
+
+        error.className = "login-validation-error d-block m-t-5";
+        error.style.color = "red";
+        error.style.fontWeight = "500";
+        error.textContent = message;
+
+        /*
+         * IMPORTANT:
+         * For password, the input is inside .input-group.
+         * Append the error AFTER the entire input-group,
+         * so it appears below the eye icon/input.
+         */
+        if (input.type === "password") {
+
+            const inputGroup = input.closest(".input-group");
+
+            if (inputGroup) {
+                inputGroup.parentElement.appendChild(error);
+            } else {
+                input.parentElement.appendChild(error);
+            }
+
+        } else {
+
+            // Email field
+            input.parentElement.appendChild(error);
+        }
+
+        input.focus();
+    }
+
+
+    // Remove email error when typing
+    loginEmail?.addEventListener("input", function () {
+
+        this.classList.remove("error-border");
+
+        const error = this.parentElement.querySelector(
+            ".login-validation-error"
+        );
+
+        if (error) {
+            error.remove();
+        }
+    });
+
+
+    // Remove password error when typing
+    loginPassword?.addEventListener("input", function () {
+
+        this.classList.remove("error-border");
+
+        const inputGroup = this.closest(".input-group");
+
+        if (inputGroup) {
+
+            const error = inputGroup.parentElement.querySelector(
+                ".login-validation-error"
+            );
+
+            if (error) {
+                error.remove();
+            }
+        }
+    });
+</script>
+<script>
+    function showLoginError(input, message) {
+
+        input.classList.add("error-border");
+
+        const error = document.createElement("small");
+
+        error.className = "login-validation-error d-block m-t-5";
+        error.style.color = "red";
+        error.style.fontWeight = "500";
+        error.textContent = message;
+
+        // Password error should appear below the input group
+        if (input.type === "password") {
+
+            const inputGroup = input.closest(".input-group");
+
+            if (inputGroup) {
+                inputGroup.parentElement.appendChild(error);
+            } else {
+                input.parentElement.appendChild(error);
+            }
+
+        } else {
+            // Email error
+            input.parentElement.appendChild(error);
+        }
+
+        input.focus();
+
+        // Hide validation error after 3 seconds
+        setTimeout(function () {
+
+            if (error) {
+                error.style.transition = "opacity 0.5s ease";
+                error.style.opacity = "0";
+
+                setTimeout(function () {
+                    error.remove();
+                    input.classList.remove("error-border");
+                }, 500);
+            }
+
+        }, 3000);
+    }
+</script>
+
+
 
 <script>
     setTimeout(() => {

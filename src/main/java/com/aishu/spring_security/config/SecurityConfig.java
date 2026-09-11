@@ -53,7 +53,7 @@ public class SecurityConfig {
             User user = userRepo.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             if (!user.isOnboardingCompleted()) {
-                response.sendRedirect("/layout");
+                response.sendRedirect("/welcome");
             } else {
                 response.sendRedirect("/dashboard");
             }

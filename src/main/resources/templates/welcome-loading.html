@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>
-   TestWheel - Welcome Loading
+    TestWheel - Welcome Loading
   </title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,33 +13,35 @@
   <link th:href="@{assets/css/bootstrap.min.css}" rel="stylesheet">
   <link th:href="@{assets/fontawesome/css/all.min.css}" rel="stylesheet">
 </head>
+
 <body>
-<div class="layout">
-  <!-- Header -->
+  <div class="layout">
+    <!-- Header -->
     <div class="fixed-top py-0 px-3 px-sm-4 box-shadow bg-white navbar-wrapper">
       <nav class="navbar navbar-expand-lg py-0">
-<div class="container-fluid container-xxl px-0 p-t-24">
-        <a class="navbar-brand col-auto me-0 py-0" href="#">
+        <div class="container-fluid container-xxl px-0 p-t-24">
+          <a class="navbar-brand col-auto me-0 py-0" href="#">
             <img src="assets/images/tw-logo.svg" alt="TestWheel Logo" height="60px">
-        </a>  
-          </div>
-      </nav>    
+          </a>
+        </div>
+      </nav>
     </div>
-  <!-- end of header -->
-  <!-- body content -->
- <div class="d-flex flex-column min-vh-100 loading">
+    <!-- end of header -->
+    <!-- body content -->
+    <div class="d-flex flex-column min-vh-100 loading">
 
-  <!-- Main Content (Centered) -->
-  <div class="container flex-grow-1 d-flex align-items-center justify-content-center step-loading-bg">
-    <div class="row w-100 justify-content-center">
+      <!-- Main Content (Centered) -->
+      <div class="container flex-grow-1 d-flex align-items-center justify-content-center step-loading-bg">
+        <div class="row w-100 justify-content-center">
 
-      <div class="col-md-4 text-center text-md-start">
-        <h3 class="head-h3 dmsans-semibold text-color1">Getting things ready</h3>
-          <p class="text-lg-start para-f3 text-color4 dmsans-regular m-t-8">We’re customizing the platform based on your role, team size, and testing goals.</p>
-      </div>
+          <div class="col-md-4 text-center text-md-start">
+            <h3 class="head-h3 dmsans-semibold text-color1">Getting things ready</h3>
+            <p class="text-lg-start para-f3 text-color4 dmsans-regular m-t-8">We’re customizing the platform based on
+              your role, team size, and testing goals.</p>
+          </div>
 
-      <div class="col-md-8 col-xxl-6 d-flex justify-content-center align-items-center mt-4 mt-md-0">
-       <!--  <div id="loading" class="fade-box d-flex align-items-center gap-3">
+          <div class="col-md-8 col-xxl-6 d-flex justify-content-center align-items-center mt-4 mt-md-0">
+            <!--  <div id="loading" class="fade-box d-flex align-items-center gap-3">
       <div class="spinner-border text-primary mb-3" role="status"></div>
       <h5>Loading...</h5>
     </div>
@@ -46,91 +49,93 @@
       <i id="tick" class="fa-solid fa-circle-check text-success fs-3"></i>
       <h5 class="text-success mt-3">Completed</h5>
     </div> -->
-    <div id="loader">
-      <div class="step" id="step1">
-        <div class="icon" id="icon1">
-          <div class="spinner-border spinner-border-sm text-primary"></div>
+            <div id="loader">
+              <div class="step" id="step1">
+                <div class="icon" id="icon1">
+                  <div class="spinner-border spinner-border-sm text-primary"></div>
+                </div>
+                <span>Setting up workspace</span>
+              </div>
+              <div class="step" id="step2">
+                <div class="icon" id="icon2"></div>
+                <span>Personalizing dashboards</span>
+              </div>
+              <div class="step" id="step3">
+                <div class="icon" id="icon3"></div>
+                <span>Preparing automation tools</span>
+              </div>
+              <div class="step" id="step4">
+                <div class="icon" id="icon4"></div>
+                <span>Configuring AI insights</span>
+              </div>
+            </div>
+
+            <!-- SUCCESS -->
+            <div id="success" class="hidden">
+              <a class="btn btn-create text-white py-2 px-5" th:href="@{/layout}">
+                <img th:src="@{assets/images/start-testing.svg}" alt="Start Testing"> Start Testing
+              </a>
+            </div>
+          </div>
+
         </div>
-        <span>Setting up workspace</span>
-      </div>
-      <div class="step" id="step2">
-        <div class="icon" id="icon2"></div>
-        <span>Personalizing dashboards</span>
-      </div>
-      <div class="step" id="step3">
-        <div class="icon" id="icon3"></div>
-        <span>Preparing automation tools</span>
-      </div>
-      <div class="step" id="step4">
-        <div class="icon" id="icon4"></div>
-        <span>Configuring AI insights</span>
-      </div>
-    </div>
-
-    <!-- SUCCESS -->
-    <div id="success" class="hidden">
-      <a class="btn btn-create text-white py-2 px-5" th:href="@{/createproject}">
-        <img th:src="@{assets/images/start-testing.svg}" alt="Start Testing"> Start Testing
-      </a>
-    </div>
       </div>
 
+      <!-- Footer stays at bottom -->
+      <footer class="text-center py-3 mt-auto">
+        <p class="para-f1 dmsans-semibold text-center p-t-8">This takes less than a minute. Once ready, you can start
+          creating and running tests immediately.</p>
+      </footer>
+
     </div>
+
   </div>
-
-  <!-- Footer stays at bottom -->
-  <footer class="text-center py-3 mt-auto">
-     <p class="para-f1 dmsans-semibold text-center p-t-8">This takes less than a minute. Once ready, you can start creating and running tests immediately.</p>
-  </footer>
-
-</div>
-
-</div>
   <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
-    <script th:src="@{assets/js/jquery.min.js}"></script>
+  <script th:src="@{assets/js/jquery.min.js}"></script>
   <script th:src="@{assets/js/tw-scripts.js}"></script>
-<script>
-  function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+  <script>
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
-async function runStep(stepId, iconId, text, time) {
-  const step = document.getElementById(stepId);
-  const icon = document.getElementById(iconId);
+    async function runStep(stepId, iconId, text, time) {
+      const step = document.getElementById(stepId);
+      const icon = document.getElementById(iconId);
 
-  // activate ONLY this step
-  step.classList.add("active");
+      // activate ONLY this step
+      step.classList.add("active");
 
-  // show spinner
-  icon.innerHTML = `<div class="spinner-border spinner-border-sm text-primary"></div>`;
+      // show spinner
+      icon.innerHTML = `<div class="spinner-border spinner-border-sm text-primary"></div>`;
 
-  await wait(time);
+      await wait(time);
 
-  // mark done
-  step.classList.remove("active");
-  step.classList.add("done");
+      // mark done
+      step.classList.remove("active");
+      step.classList.add("done");
 
-  // replace with tick
-  icon.innerHTML = `<i class="fa-solid fa-circle-check load-text-success"></i>`;
-}
-async function start() {
-  await runStep("step1", "icon1", "Loading", 1500);
-  await runStep("step2", "icon2", "Processing", 1500);
-  await runStep("step3", "icon3", "Finalizing", 1500);
-  await runStep("step4", "icon4", "Finalizing", 2500);
+      // replace with tick
+      icon.innerHTML = `<i class="fa-solid fa-circle-check load-text-success"></i>`;
+    }
+    async function start() {
+      await runStep("step1", "icon1", "Loading", 1500);
+      await runStep("step2", "icon2", "Processing", 1500);
+      await runStep("step3", "icon3", "Finalizing", 1500);
+      await runStep("step4", "icon4", "Finalizing", 2500);
 
-  // finish
-  await wait(500);
+      // finish
+      await wait(500);
 
-  document.getElementById("loader").style.display = "none";
-  document.getElementById("success").classList.remove("hidden");
-}
+      document.getElementById("loader").style.display = "none";
+      document.getElementById("success").classList.remove("hidden");
+    }
 
-function continueNext() {
-  alert("Continue clicked!");
-}
+    function continueNext() {
+      alert("Continue clicked!");
+    }
 
-start();
-</script>
+    start();
+  </script>
 </body>
+
 </html>

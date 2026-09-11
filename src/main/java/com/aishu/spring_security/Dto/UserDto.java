@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 public class UserDto {
     private String firstName;
     private String lastName;
-    private String username;//mail
+    private String username;// mail
     private String phoneCode = "+91";
     private String phone;
     private String password;

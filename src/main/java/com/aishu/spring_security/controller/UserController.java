@@ -46,48 +46,81 @@ public class UserController {
     JavaMailSender javaMailSender;
 
     @PostMapping("/signup")
-    public String register(@Valid @ModelAttribute("user") User user,
+    public String register(
+            @Valid @ModelAttribute("user") User user,
             BindingResult result,
-            Model model, RedirectAttributes redirectAttributes) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
         try {
+
             // Server-side validation
-            if (user.getFirstName() == null || user.getFirstName().trim().isEmpty()) {
+            if (user.getFirstName() == null ||
+                    user.getFirstName().trim().isEmpty()) {
+
                 model.addAttribute("message", "First name is required.");
-                return "signup";
+                return "tw-signup-new";
             }
-            if (user.getUsername() == null
-                    || !user.getUsername().trim().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+
+            if (user.getUsername() == null ||
+                    !user.getUsername().trim()
+                            .matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+
                 model.addAttribute("message", "Please enter a valid email address.");
-                return "signup";
+                return "tw-signup-new";
             }
-            if (user.getPassword() == null || user.getPassword().length() < 6) {
-                model.addAttribute("message", "Password must be at least 6 characters long.");
-                return "signup";
+
+            if (user.getPassword() == null ||
+                    user.getPassword().length() < 6) {
+
+                model.addAttribute(
+                        "message",
+                        "Password must be at least 6 characters long.");
+
+                return "tw-signup-new";
             }
-            if (user.getConfirmPassword() != null && !user.getConfirmPassword().isEmpty()
-                    && !user.getPassword().equals(user.getConfirmPassword())) {
+
+            if (user.getConfirmPassword() != null &&
+                    !user.getConfirmPassword().isEmpty() &&
+                    !user.getPassword().equals(user.getConfirmPassword())) {
+
                 model.addAttribute("message", "Passwords do not match!");
-                return "signup";
+                return "tw-signup-new";
             }
 
             if (userRepo.existsByUsername(user.getUsername().trim())) {
-                model.addAttribute("message", "Email address already exists!");
-                return "signup";
+
+                model.addAttribute(
+                        "message",
+                        "Email address already exists!");
+
+                return "tw-signup-new";
             }
-            if (user.getPhone() != null && !user.getPhone().trim().isEmpty()
-                    && userRepo.existsByPhone(user.getPhone().trim())) {
-                model.addAttribute("message", "Phone number already exists!");
-                return "signup";
+
+            // if (user.getPhone() != null &&
+            // !user.getPhone().trim().isEmpty() &&
+            // userRepo.existsByPhone(user.getPhone().trim())) {
+
+            // model.addAttribute(
+            // "message",
+            // "Phone number already exists!");
+
+            // return "tw-signup-new";
+            // }
+
+            // Bean validation errors
+            if (result.hasErrors()) {
+
+                return "tw-signup-new";
             }
 
             // Encode password before saving
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setPassword(
+                    passwordEncoder.encode(user.getPassword()));
+
             user.setEnabled(false);
 
-            if (result.hasErrors()) {
-                return "signup"; // redisplay form with inline errors
-            }
-
+            // Continue with your existing save / activation logic here
             userRepo.save(user);
 
             // Generate token + send email
@@ -114,10 +147,17 @@ public class UserController {
         } catch (DataIntegrityViolationException e) {
             model.addAttribute("message", "Duplicate data detected. Please check your details.");
             return "signup";
-        } catch (Exception e) {
-            logger.error("Error during user signup", e);
-            model.addAttribute("message", "Account creation failed!");
-            return "signup";
+        }
+
+        catch (Exception e) {
+
+            e.printStackTrace();
+
+            model.addAttribute(
+                    "message",
+                    "Unable to complete registration. Please try again.");
+
+            return "tw-signup-new";
         }
     }
 }
