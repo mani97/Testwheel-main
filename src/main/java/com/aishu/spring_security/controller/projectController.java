@@ -111,7 +111,7 @@ public class projectController {
                         p.getCreatedBy() != null ? p.getCreatedBy().getFirstName() : "",
                         p.getProjectUrl(),
                         p.getUsername() != null ? Long.valueOf(p.getUsername().getId()) : null,
-                        p.getUsername() != null ? p.getUsername().getFirstName() : "",
+                        p.getUsername() != null ? p.getUsername().getFirstName() : "new",
                         p.getCreatedAt()))
                 .collect(java.util.stream.Collectors.toList());
     }
