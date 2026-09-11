@@ -263,7 +263,7 @@
                             </p>
 
                             <p class="text-color4 para-f4 mb-0">
-                                Created By ${project.createdBy ? project.createdBy.username || project.createdBy.firstName || '' : ''}
+                                Created By ${project.createdByName || ''}
                             </p>
                         </span>
 
@@ -840,8 +840,8 @@
                                         <textarea id="description" th:field="*{description}"
                                             class="form-control form-input" rows="6" cols="50"
                                             placeholder="Describe what this test does..."></textarea>
-                                        <small th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
-                                            style="color:red; font-weight:bold;"></small>
+                                        <small id="descriptionFeedback" th:if="${#fields.hasErrors('description')}"
+                                            th:errors="*{description}" style="color:red; font-weight:bold;"></small>
                                         <small id="descriptionFeedback" class="d-block m-t-5">Enter the
                                             description</small>
                                     </div>
