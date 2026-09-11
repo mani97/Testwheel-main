@@ -102,8 +102,15 @@ public class projectController {
     @GetMapping("/projects")
     @ResponseBody
     @Transactional
-    public List<ProjectDto> getProjects() {
-        return projectRepo.findAll().stream()
+    public List<ProjectDto> getProjects(Authentication authentication) {
+        /*
+         * Get currently authenticated user
+         */
+        User currentUser = userRepo
+                .findByUsername(authentication.getName())
+                .orElseThrow();
+        List<Project> projects = projectRepo.findByCreatedBy(currentUser);
+        return projects.stream()
                 .map(p -> new ProjectDto(
                         p.getProjectId(),
                         p.getProjectName(),
@@ -119,9 +126,14 @@ public class projectController {
     @GetMapping("/project-cards")
     @ResponseBody
     @Transactional
-    public List<com.aishu.spring_security.Dto.ProjectCardDTO> getProjectCards() {
-        List<Project> projects = projectRepo.findAll();
+    public List<com.aishu.spring_security.Dto.ProjectCardDTO> getProjectCards(Authentication authentication) {
+        User currentUser = userRepo
+                .findByUsername(authentication.getName())
+                .orElseThrow();
+        List<Project> projects = projectRepo.findByCreatedBy(currentUser);
+
         return projects.stream().map(p -> new com.aishu.spring_security.Dto.ProjectCardDTO(
+
                 p.getProjectName(),
                 p.getTests() != null ? p.getTests().size() : 0,
                 p.getUsername() != null ? 1 : 0,

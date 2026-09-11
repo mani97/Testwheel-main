@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProjectCardDTO {
+
     private String projectName;
     private int testCases;
     private int users;

@@ -1,6 +1,7 @@
 package com.aishu.spring_security.Repository;
 
 import com.aishu.spring_security.model.Project;
+import com.aishu.spring_security.model.User;
 
 import java.util.List;
 
@@ -13,5 +14,9 @@ public interface ProjectRepository extends JpaRepository<Project, Integer>, JpaS
 
     List<Project> findByCreatedByIdInOrderByCreatedAtDesc(
             List<Long> userIds);
+
+    List<Project> findByCreatedBy(User currentUser);
+
+    List<Project> findByUsername(User currentUser);
 
 }

@@ -349,14 +349,32 @@
                                         </p>
                                     </div>
 
-                                    <div class="row p-t-24 px-3 justify-content-center">
+                                    <!-- <div class="row p-t-24 px-3 justify-content-center">
                                         <div class="col-auto"><a
                                                 class="btn btn-border-bg p-lr-36 p-tb-12 text-color1 button-f2">NO</a>
                                         </div>
                                         <div class="col-auto"><a
                                                 class="btn btn-create p-lr-36 p-tb-12 text-white button-f2">Yes</a>
                                         </div>
+                                    </div> -->
+
+                                    <div class="row p-t-24 px-3 justify-content-center">
+                                        <div class="col-auto">
+                                            <a href="#" class="btn btn-border-bg p-lr-36 p-tb-12 text-color1 button-f2"
+                                                data-bs-dismiss="modal">
+                                                NO
+                                            </a>
+                                        </div>
+
+                                        <div class="col-auto">
+                                            <a href="#" id="confirmDeleteProject"
+                                                class="btn btn-create p-lr-36 p-tb-12 text-white button-f2">
+                                                Yes
+                                            </a>
+                                        </div>
                                     </div>
+
+
                                 </div>
                             </div>
                         </div>
@@ -410,6 +428,205 @@
                             });
                     }
                 </script>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+
+                        const editModal = document.getElementById("editProject");
+                        let editButton = null;
+
+                        if (!editModal) {
+                            return;
+                        }
+
+                        editModal.addEventListener("show.bs.modal", function (event) {
+
+                            editButton = event.relatedTarget;
+
+                        });
+
+                        editModal.addEventListener("hide.bs.modal", function () {
+
+                            // Remove focus before Bootstrap sets aria-hidden="true"
+                            if (document.activeElement &&
+                                editModal.contains(document.activeElement)) {
+
+                                document.activeElement.blur();
+                            }
+
+                        });
+
+                        editModal.addEventListener("hide.bs.modal", function () {
+
+                            // Return focus to the button that opened the modal
+                            if (editButton) {
+                                editButton.focus();
+                            }
+
+                        });
+
+                    });
+                </script>
+
+
+
+
+                <script>
+                    function loadProjectCards() {
+
+                        fetch('/project-cards')
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error("Failed to load projects");
+                                }
+
+                                return response.json();
+                            })
+                            .then(projects => {
+
+                                const container =
+                                    document.getElementById("project-container");
+
+                                container.innerHTML = "";
+
+                                projects.forEach(project => {
+
+                                    const card = `
+                        <div class="col-12 col-sm-6 col-xxl-3 col-lg-4 p-b-24"
+                             data-project-id="${project.projectId}"
+                             data-project-name="${encodeURIComponent(project.projectName)}">
+
+                            <div class="card project-card shadow-sm"
+                                 style="cursor:pointer;">
+
+                                <div class="card-body">
+
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+                                        <p class="mb-0 para-f1 dmsans-medium text-color1">
+                                            ${project.projectName}
+                                        </p>
+
+                                        <div class="dropdown">
+
+                                            <a class="btn btn-sm"
+                                               href="#"
+                                               data-bs-toggle="dropdown"
+                                               onclick="event.stopPropagation();">
+
+                                                <i class="fa-solid fa-ellipsis-vertical text-color4"></i>
+
+                                            </a>
+
+                                            <ul class="dropdown-menu dropdown-menu-end py-3 px-0">
+
+                                                <li class="m-b-16 ps-3">
+
+                                                    <a class="dropdown-item edit-project-btn"
+                                                       href="#"
+                                                       data-bs-toggle="modal"
+                                                       data-bs-target="#editProject"
+                                                       data-project-id="${project.projectId}"
+                                                       onclick="event.stopPropagation();">
+
+                                                        <img src="assets/images/edit-icon.svg"
+                                                             class="me-2">
+
+                                                        Edit
+                                                    </a>
+
+                                                </li>
+
+                                                <li class="ps-3">
+
+                                                    <a class="dropdown-item delete-project-btn"
+   href="#"
+   data-bs-toggle="modal"
+   data-bs-target="#deleteProject"
+   data-project-id="${project.projectId}"
+   data-project-name="${encodeURIComponent(project.projectName)}"
+   onclick="event.stopPropagation();">
+
+    <img src="assets/images/delete-icon.svg" class="me-2">
+
+    Delete
+</a>
+
+
+                                                </li>
+
+                                            </ul>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center project-info custom-border p-b-8">
+
+                                        <div class="d-flex align-items-center gap-1">
+
+                                            <img src="assets/images/test-cases.svg"
+                                                 class="me-1">
+
+                                            <span class="head-h4">
+                                                ${project.testCases}
+                                            </span>
+
+                                            <span class="para-f4">
+                                                Test Cases
+                                            </span>
+
+                                        </div>
+
+                                        <div class="d-flex align-items-center gap-1">
+
+                                            <img src="assets/images/user-list-icon.svg"
+                                                 class="me-1">
+
+                                            <span class="head-h4">
+                                                ${project.users}
+                                            </span>
+
+                                            <span class="para-f4">
+                                                Users
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="d-flex justify-content-between flex-wrap card-footer-custom p-t-8">
+
+                                        <span class="para-f4 text-color4">
+                                            Created by ${project.createdBy}
+                                        </span>
+
+                                        <span class="para-f4 text-color4">
+                                            ${project.createdAt}
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    `;
+
+                                    container.insertAdjacentHTML("beforeend", card);
+                                });
+                            })
+                            .catch(error => {
+                                console.error("Error loading projects:", error);
+                            });
+                    }
+
+                    document.addEventListener("DOMContentLoaded", function () {
+                        loadProjectCards();
+                    });
+                </script>
+
                 <script>
                     function refreshTestCount() {
                         fetch('/testrequest/count')
