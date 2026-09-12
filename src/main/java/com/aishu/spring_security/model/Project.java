@@ -18,10 +18,11 @@ import lombok.EqualsAndHashCode;
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 @Entity
 @Table(name = "new_project")
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class Project {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_id")
@@ -53,13 +54,5 @@ public class Project {
     @EqualsAndHashCode.Exclude
     @JsonIgnore
     private List<TestEntity> tests;
-
-    public User getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
-    }
 
 }

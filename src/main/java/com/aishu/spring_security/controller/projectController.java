@@ -40,7 +40,7 @@ public class projectController {
     UserRepo userRepo;
 
     @GetMapping("/createproject")
-    public String createProject(Model model) {
+    public String createProject1(Model model) {
 
         model.addAttribute("project", new ProjectDto());
         return "create-project";
@@ -123,21 +123,24 @@ public class projectController {
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    @GetMapping("/project-cards")
-    @ResponseBody
-    @Transactional
-    public List<com.aishu.spring_security.Dto.ProjectCardDTO> getProjectCards(Authentication authentication) {
-        User currentUser = userRepo
-                .findByUsername(authentication.getName())
-                .orElseThrow();
-        List<Project> projects = projectRepo.findByCreatedBy(currentUser);
+    // @GetMapping("/project-cards")
+    // @ResponseBody
+    // @Transactional
+    // public List<com.aishu.spring_security.Dto.ProjectCardDTO>
+    // getProjectCards(Authentication authentication) {
+    // User currentUser = userRepo
+    // .findByUsername(authentication.getName())
+    // .orElseThrow();
+    // List<Project> projects = projectRepo.findByCreatedBy(currentUser);
 
-        return projects.stream().map(p -> new com.aishu.spring_security.Dto.ProjectCardDTO(
+    // return projects.stream().map(p -> new
+    // com.aishu.spring_security.Dto.ProjectCardDTO(
+    // p.getProjectId(),
 
-                p.getProjectName(),
-                p.getTests() != null ? p.getTests().size() : 0,
-                p.getUsername() != null ? 1 : 0,
-                p.getCreatedBy() != null ? p.getCreatedBy().getFirstName() : "",
-                p.getCreatedAt())).collect(java.util.stream.Collectors.toList());
-    }
+    // p.getProjectName(),
+    // p.getTests() != null ? p.getTests().size() : 0,
+    // p.getUsername() != null ? 1 : 0,
+    // p.getCreatedBy() != null ? p.getCreatedBy().getFirstName() : "",
+    // p.getCreatedAt())).collect(java.util.stream.Collectors.toList());
+    // }
 }

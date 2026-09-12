@@ -96,7 +96,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/signup", "/verify", "/check-email", "/login", "/assets/**", "/css/**",
                                 "/js/**",
                                 "/images/**", "/favicon.png", "/favicon.ico", "/forgot-password-phone", "/verify-otp",
-                                "/reset-password", "/createproject2")
+                                "/reset-password", "/createproject2", "/err")
                         .permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
@@ -117,6 +117,11 @@ public class SecurityConfig {
                         .maximumSessions(1)
                         .sessionRegistry(sessionRegistry)
                         .expiredUrl("/timeout"))
+                .exceptionHandling(ex -> ex
+                        .accessDeniedPage("/err") // 👈 page for 403 forbidden
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendRedirect("/err"); // 👈 page for 401 unauthorized
+                        }))
                 .csrf(Customizer.withDefaults());
 
         return http.build();

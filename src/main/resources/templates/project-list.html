@@ -1,20 +1,4 @@
 <!DOCTYPE html>
-<script>
-    // On dashboard load, fetch selected project to highlight if any
-    document.addEventListener('DOMContentLoaded', function () {
-        fetch('/projects/selected')
-            .then(r => r.json())
-            .then(data => {
-                if (data.SelectedProjectId) {
-                    const sel = document.querySelector(`[data-project-id='${data.SelectedProjectId}']`);
-                    if (sel) {
-                        sel.style.outline = '2px solid #4A90E2';
-                    }
-                }
-            })
-            .catch(err => console.error('Error loading selected project', err));
-    });
-</script>
 <html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
@@ -23,7 +7,6 @@
     </title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" th:href="@{/favicon.png}" />
     <link th:href="@{assets/css/common-styles.css}" rel="stylesheet">
     <link th:href="@{assets/css/login-styles.css}" rel="stylesheet">
     <link th:href="@{assets/css/after-login-styles.css}" rel="stylesheet">
@@ -116,35 +99,30 @@
                     <div class="col-6 text-center text-md-end d-flex justify-content-md-end">
                         <a th:href="@{/create-testcase}"
                             class="btn btn-create create-btn p-tb-12 p-lr-16 text-white button-f2"><img
-                                th:src="@{/assets/images/create-test-icon.svg}" alt="Icon" class="pe-2"> Create Test</a>
+                                src="assets/images/create-test-icon.svg" alt="Icon" class="pe-2"> Create Test</a>
                     </div>
                 </div>
 
-
                 <div class="row p-t-24 filter-drpdwn">
-
                     <div class="col-auto p-b-24">
                         <div class="dropdown">
                             <a class="btn filter-btn d-flex para-f4 dmsans-semibold text-color1" type="button"
                                 data-bs-toggle="dropdown"><span>Sort By</span><i
                                     class="fa-solid fa-chevron-down"></i></a>
+
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item para-f4 dmsans-regular text-color1"
-                                        th:href="@{/projects?sort=createdDate,desc}">Newest
-                                        First</a></li>
+                                        th:href="@{/testlist(sort='newest')}">Newest First</a></li>
                                 <li><a class="dropdown-item para-f4 dmsans-regular text-color1"
-                                        th:href="@{/projects?sort=createdDate,asc}">Oldest
-                                        First</a></li>
+                                        th:href="@{/testlist(sort='oldest')}">Oldest First</a></li>
                                 <li><a class="dropdown-item para-f4 dmsans-regular text-color1"
-                                        th:href="@{/projects?sort=name,asc}">Name A-Z</a>
-                                </li>
+                                        th:href="@{/testlist(sort='nameAsc')}">Name A-Z</a></li>
                                 <li><a class="dropdown-item para-f4 dmsans-regular text-color1"
-                                        th:href="@{/projects?sort=name,desc}">Name Z-A</a>
-                                </li>
+                                        th:href="@{/testlist(sort='nameDesc')}">Name Z-A</a></li>
                             </ul>
+
                         </div>
                     </div>
-
 
                     <div class="col-auto p-b-24">
                         <div class="dropdown">
@@ -153,7 +131,6 @@
                                 <span>Created By</span>
                                 <i class="fa-solid fa-chevron-down"></i>
                             </a>
-
                             <div class="dropdown-menu">
                                 <div class="user-list">
                                     <!-- Loop through users -->
@@ -162,85 +139,87 @@
                                             th:value="${user.id}" th:name="createdBy"
                                             th:checked="${selectedCreatedBy.contains(user.id)}" />
                                         <label class="form-check-label para-f4 dmsans-regular text-color1"
-                                            th:for="'user' + ${user.id}" th:text="${user.firstName}">User
-                                            Name</label>
+                                            th:for="'user' + ${user.id}" th:text="${user.username}">User Name</label>
                                     </div>
                                 </div>
-
                                 <div class="dropdown-divider-custom">
                                     <a type="button" class="clear-btn text-center para-f4 dmsans-semibold text-color4"
                                         onclick="clearCreatedBy()">Clear</a>
                                 </div>
                             </div>
-
-
-
                         </div>
                     </div>
+
+
                 </div>
 
+
+
+
+                <!--  card creation -->
 
                 <div class="row">
+                    <!-- Loop through projectCards -->
+                    <div class="col-12 col-sm-6 col-xxl-3 col-lg-4 p-b-24" th:each="card : ${projectCards}">
+                        <div class="card project-card shadow-sm">
+                            <div class="card-body">
+                                <!-- Project name -->
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <p class="mb-0 para-f1 dmsans-medium text-color1" th:text="${card.projectName}">
+                                        Project Name</p>
+                                    <div class="dropdown">
+                                        <a class="btn btn-sm" data-bs-toggle="dropdown">
+                                            <i class="fa-solid fa-ellipsis-vertical text-color4"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-end py-3 px-0">
+                                            <li class="m-b-16 ps-3">
+                                                <a class="dropdown-item text-color1 dmsans-semibold para-f4 px-0 d-flex align-self-center"
+                                                    data-bs-toggle="modal" data-bs-target="#editProject"
+                                                    th:attr="data-id=${card.projectId}, data-name=${card.projectName}, data-url=${card.projectUrl}">
+                                                    <img src="assets/images/edit-icon.svg" alt="Edit" class="me-2">Edit
+                                                </a>
 
-                    <!-- Create project card 1-->
+                                            </li>
+                                            <li class="m-b-16 ps-3">
+                                                <a class="dropdown-item text-color1 dmsans-semibold para-f4 px-0 d-flex align-self-center"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteProject"
+                                                    th:attr="data-id=${card.projectId}, data-name=${card.projectName}, data-url=${card.projectUrl}">
+                                                    <img src="assets/images/delete-icon.svg" alt="Delete"
+                                                        class="me-2">Delete
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
 
+                                <!-- Test cases and users -->
+                                <div
+                                    class="d-flex justify-content-between align-items-center project-info custom-border p-b-8">
+                                    <div class="d-flex align-items-center gap-1">
+                                        <img src="assets/images/test-cases.svg" alt="Test Cases" class="me-1">
+                                        <span class="head-h4 dmsans-regular text-color1"
+                                            th:text="${card.testCases}">0</span>
+                                        <span class="para-f4 dmsans-regular text-color1">Test Cases</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <img src="assets/images/user-list-icon.svg" alt="Users" class="me-1">
+                                        <span class="head-h4 dmsans-regular text-color1"
+                                            th:text="${card.users}">0</span>
+                                        <span class="para-f4 dmsans-regular text-color1">Users</span>
+                                    </div>
+                                </div>
 
-
-
-                    <!-- Create project card 2-->
-                    <script>
-                        fetch('/project-cards')
-                            .then(response => response.json())
-                            .then(projects => {
-                                const container = document.getElementById("project-container");
-                                projects.forEach(project => {
-                                    const card = `
-      <div class="col-12 col-sm-6 col-xxl-3 col-lg-4 p-b-24" data-project-id="${project.projectId}" data-project-name="${encodeURIComponent(project.projectName)}">
-        <div class="card project-card shadow-sm" style="cursor:pointer;">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <p class="mb-0 para-f1 dmsans-medium text-color1">${project.projectName}</p>
-
-
-
-              <div class="dropdown">
-                <a class="btn btn-sm" 
-                href="#" 
-                data-bs-toggle="dropdown" 
-                onclick="event.stopPropagation();">
-                  <i class="fa-solid fa-ellipsis-vertical text-color4"></i>
-                </a>
-
-                <ul class="dropdown-menu dropdown-menu-end py-3 px-0">
-
-                  <li class="m-b-16 ps-3">
-                    <a class="dropdown-item text-color1 dmsans-semibold para-f4 px-0 d-flex align-items-center edit-project-btn"
-                      href="#"
-                      data-bs-toggle="modal" 
-                      data-bs-target="#editProject"
-                      data-project-id="${project.projectId}" 
-                      data-project-name="${encodeURIComponent(project.projectName)}"
-                      onclick="event.stopPropagation();">
-                      <img loading="lazy" src="assets/images/edit-icon.svg" alt="Edit" class="me-2">
-                      Edit
-                    </a>
-                  </li>
-
-                  <li class="ps-3">
-                    <a class="dropdown-item text-color1 dmsans-semibold para-f4 px-0 d-flex align-items-center delete-project-btn"
-                      href="#"
-                      data-bs-toggle="modal"
-                      data-bs-target="#deleteProject"
-                      data-project-id="${project.projectId}"
-                      data-project-name="${encodeURIComponent(project.projectName)}"
-               onclick="event.stopPropagation();">
-                <img loading="lazy" src="assets/images/delete-icon.svg" alt="Delete" class="me-2">
-                Delete
-            </a>
-        </li>
-
-    </ul>
-</div>
+                                <!-- Footer -->
+                                <div class="d-flex justify-content-between flex-wrap card-footer-custom p-t-8">
+                                    <span class="para-f4 dmsans-regular text-color4"
+                                        th:text="'Created by ' + ${card.createdBy}">Created by</span>
+                                    <span class="para-f4 dmsans-regular text-color4"
+                                        th:text="${#temporals.format(card.createdAt, 'dd-MMM-yyyy')}">Date</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 
 
@@ -248,149 +227,109 @@
 
 
             </div>
-
-            <div class="d-flex justify-content-between align-items-center project-info custom-border p-b-8">
-              <div class="d-flex align-items-center gap-1">
-                <img loading="lazy" src="assets/images/test-cases.svg" alt="Test Cases" class="me-1">
-                <span class="head-h4 dmsans-regular text-color1">${project.testCases}</span>
-                <span class="para-f4 dmsans-regular text-color1">Test Cases</span>
-              </div>
-              <div class="d-flex align-items-center gap-1">
-                <img loading="lazy" src="assets/images/user-list-icon.svg" alt="Users" class="me-1">
-                <span class="head-h4 dmsans-regular text-color1">${project.users}</span>
-                <span class="para-f4 dmsans-regular text-color1">Users</span>
-              </div>
-            </div>
-            <div class="d-flex justify-content-between flex-wrap card-footer-custom p-t-8">
-              <span class="para-f4 dmsans-regular text-color4">Created by ${project.createdBy}</span>
-              <span class="para-f4 dmsans-regular text-color4">${project.createdAt}</span>
-            </div>
-          </div>
         </div>
-      </div>`;
-                                    container.insertAdjacentHTML("beforeend", card);
-                                    // Attach click listener to store selection in session
-                                    const cardElem = container.lastElementChild;
-                                    cardElem.addEventListener('click', function (e) {
-                                        // Prevent dropdown actions from triggering selection
-                                        if (e.target.closest('.dropdown')) {
-                                            return;
-                                        }
-                                        const projId = this.getAttribute('data-project-id');
-                                        const projName = decodeURIComponent(this.getAttribute('data-project-name'));
-                                        fetch('/projects/select', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                            body: 'projectId=' + encodeURIComponent(projId) + '&projectName=' + encodeURIComponent(projName)
-                                        });
-                                    });
-                                });
-                            })
-                            .catch(error => console.error("Error loading projects:", error));
-                    </script>
-                    <div id="project-container" class="row"></div>
 
-
-
-                </div>
-
-                <div class="modal fade" id="editProject" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content position-relative">
-                            <div class="modal-body p-t-16 p-b-36 px-md-2 px-lg-3 px-1 position-relative">
-                                <div class="container-fluid">
-                                    <div class="row"><a type="button" class="text-end" data-bs-dismiss="modal"
-                                            aria-label="Close"><img src="assets/images/popup-close.svg" alt="Close"></a>
-                                    </div>
-                                    <div class="row">
-                                        <div><img loading="lazy" src="assets/images/new-project.svg"
-                                                alt="Create Project"></div>
-                                    </div>
-                                    <div class="row p-t-16">
-                                        <p class="head-h4 dmsans-semibold px-3 text-color1">Edit Project Name</p>
-                                        <p class="para-f3 px-3 dmsans-regular text-color4 p-t-8">What is the name of
-                                            the
-                                            website
-                                            you’re going to test?</p>
-                                    </div>
-                                    <div class="row p-t-16 px-3">
-                                        <label for="" class="form-label px-0">Project Name</label>
-                                        <input type="text" class="form-control form-input" placeholder="Test Wheel"
-                                            id="" aria-describedby="">
-                                        <p class="para-f3 dmsans-regular text-color1 px-0">Project Name</p>
-                                    </div>
-                                    <div class="row p-t-24 px-3">
-                                        <label for="" class="form-label px-0">Project URL*</label>
-                                        <input type="text" class="form-control form-input"
-                                            placeholder="e.g. app.testwheel.com" id="" aria-describedby="">
-                                        <div id="" class="text-color9 px-0 pt-1">Enter Project URL</div>
-                                    </div>
-                                    <div class="row p-t-24 px-3"><a
-                                            class="btn btn-create px-lg-4 p-tb-14 text-white button-f1">Update</a>
-                                    </div>
-                                </div>
+        <!-- update project Modal-->
+        <div class="modal fade" id="editProject" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content position-relative">
+                    <div class="modal-body p-t-16 p-b-36 px-md-2 px-lg-3 px-1 position-relative">
+                        <div class="container-fluid">
+                            <div class="row"><a type="button" class="text-end" data-bs-dismiss="modal"
+                                    aria-label="Close"><img src="assets/images/popup-close.svg" alt="Close"></a></div>
+                            <div class="row">
+                                <div><img loading="lazy" src="assets/images/new-project.svg" alt="Create Project"></div>
                             </div>
+                            <div class="row p-t-16">
+                                <p class="head-h4 dmsans-semibold px-3 text-color1">Edit Project Name</p>
+                                <p class="para-f3 px-3 dmsans-regular text-color4 p-t-8">What is the name of the website
+                                    you’re going to test?</p>
+                            </div>
+
+                            <form th:action="@{/projects/update}" method="post" id="editProjectForm">
+                                <input type="hidden" id="editProjectId" name="projectId" />
+                                <div class="row p-t-16 px-3">
+                                    <label class="form-label px-0">Project Name*</label>
+                                    <input type="text" class="form-control form-input" id="editProjectName"
+                                        name="projectName" placeholder="Enter Project Name Here*" />
+                                </div>
+                                <div class="row p-t-24 px-3">
+                                    <label class="form-label px-0">Project URL*</label>
+                                    <input type="text" class="form-control form-input" id="editProjectUrl"
+                                        name="projectUrl" placeholder="e.g. app.testwheel.com" />
+                                </div>
+                                <div class="row p-t-24 px-3">
+                                    <button type="submit"
+                                        class="btn btn-create px-lg-4 p-tb-14 text-white button-f1">Update</button>
+                                </div>
+                            </form>
+
                         </div>
                     </div>
                 </div>
-
-                <div class="modal fade" id="deleteProject" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content position-relative">
-                            <div class="modal-body p-t-16 p-b-36 px-md-2 px-lg-3 px-1 position-relative">
-                                <div class="container-fluid">
-                                    <div class="row"><a type="button" class="text-end" data-bs-dismiss="modal"
-                                            aria-label="Close"><img src="assets/images/popup-close.svg" alt="Close"></a>
-                                    </div>
-                                    <div class="row">
-                                        <p class="para-f1 dmsans-regular px-4 text-color1">Are you sure to delete
-                                            project <span class="text-color3 dmsans-semibold">“Project name”</span>
-                                            ?
-                                        </p>
-                                    </div>
-
-                                    <!-- <div class="row p-t-24 px-3 justify-content-center">
-                                        <div class="col-auto"><a
-                                                class="btn btn-border-bg p-lr-36 p-tb-12 text-color1 button-f2">NO</a>
-                                        </div>
-                                        <div class="col-auto"><a
-                                                class="btn btn-create p-lr-36 p-tb-12 text-white button-f2">Yes</a>
-                                        </div>
-                                    </div> -->
-
-                                    <div class="row p-t-24 px-3 justify-content-center">
-                                        <div class="col-auto">
-                                            <a href="#" class="btn btn-border-bg p-lr-36 p-tb-12 text-color1 button-f2"
-                                                data-bs-dismiss="modal">
-                                                NO
-                                            </a>
-                                        </div>
-
-                                        <div class="col-auto">
-                                            <a href="#" id="confirmDeleteProject"
-                                                class="btn btn-create p-lr-36 p-tb-12 text-white button-f2">
-                                                Yes
-                                            </a>
-                                        </div>
-                                    </div>
+            </div>
+        </div>
 
 
-                                </div>
+        <div class="modal fade" id="deleteProject" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content position-relative">
+                    <div class="modal-body p-t-16 p-b-36 px-md-2 px-lg-3 px-1 position-relative">
+                        <div class="container-fluid">
+                            <div class="row"><a type="button" class="text-end" data-bs-dismiss="modal"
+                                    aria-label="Close"><img src="assets/images/popup-close.svg" alt="Close"></a>
                             </div>
+                            <!-- <div class="row">
+                                <p class="para-f1 dmsans-regular px-4 text-color1">Are you sure to delete project
+                                    <span class="text-color3 dmsans-semibold">“Project name”</span> ?
+                                </p>
+                            </div>
+
+                            <div class="row p-t-24 px-3 justify-content-center">
+                                <div class="col-auto"><a
+                                        class="btn btn-border-bg p-lr-36 p-tb-12 text-color1 button-f2">NO</a></div>
+                                <div class="col-auto"><a
+                                        class="btn btn-create p-lr-36 p-tb-12 text-white button-f2">Yes</a></div>
+                            </div> -->
+                            <!-- Insert your form here -->
+                            <form th:action="@{/projects/delete}" method="post" id="deleteProjectForm">
+                                <input type="hidden" id="deleteProjectId" name="projectId" />
+                                <p class="para-f1 dmsans-regular px-4 text-color1">
+                                    Are you sure to delete project
+                                    <span id="deleteProjectName" class="text-color3 dmsans-semibold">“Project
+                                        name”</span> ?
+                                </p>
+                                <div class="row p-t-24 px-3 justify-content-center">
+                                    <div class="col-auto">
+                                        <a type="button" class="btn btn-border-bg p-lr-36 p-tb-12 text-color1 button-f2"
+                                            data-bs-dismiss="modal">NO</a>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="submit"
+                                            class="btn btn-create p-lr-36 p-tb-12 text-white button-f2">Yes</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <!-- End form -->
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <script>
-                    function loadNotifications() {
-                        fetch('/notifications')
-                            .then(response => response.json())
-                            .then(data => {
-                                let dropdown = document.getElementById('notificationDropdown');
-                                dropdown.innerHTML = ""; // clear old items
 
-                                // Header
-                                dropdown.innerHTML += `
+
+
+        <script>
+            function loadNotifications() {
+                fetch('/notifications')
+                    .then(response => response.json())
+                    .then(data => {
+                        let dropdown = document.getElementById('notificationDropdown');
+                        dropdown.innerHTML = ""; // clear old items
+
+                        // Header
+                        dropdown.innerHTML += `
                           <div class="d-flex justify-content-between px-4 brdr-btm-1 py-3">
                             <div class="col-sm-6">
                               <p class="para-f3 dmsans-semibold text-color1">
@@ -402,9 +341,9 @@
                             </div>
                           </div>`;
 
-                                // Loop notifications
-                                data.forEach(note => {
-                                    dropdown.innerHTML += `
+                        // Loop notifications
+                        data.forEach(note => {
+                            dropdown.innerHTML += `
                               <div class="brdr-btm-1 d-flex bg-color2 p-3">
                                 <div class="col-auto"><img src="/assets/images/test-execution.svg" alt="Icon" /></div>
                                 <div class="col-11">
@@ -415,256 +354,115 @@
                                   <p class="para-f4 px-3 text-color6">${note.timeAgo}</p>
                                 </div>
                               </div>`;
-                                });
+                        });
 
-                                // Footer
-                                dropdown.innerHTML += `
+                        // Footer
+                        dropdown.innerHTML += `
                           <div class="py-3 px-3">
                             <a class="dropdown-item text-color3 dmsans-semibold text-center" href="#">View all notifications</a>
                           </div>`;
 
-                                // update badge count
-                                document.getElementById('notificationBadge').textContent = data.length;
-                            });
-                    }
-                </script>
+                        // update badge count
+                        document.getElementById('notificationBadge').textContent = data.length;
+                    });
+            }
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const editModal = document.getElementById('editProject');
+                editModal.addEventListener('show.bs.modal', event => {
+                    const button = event.relatedTarget;
+                    const projectId = button.getAttribute('data-id');
+                    const projectName = button.getAttribute('data-name');
+                    const projectUrl = button.getAttribute('data-url');
 
-                <script>
-                    document.addEventListener("DOMContentLoaded", function () {
+                    editModal.querySelector('#editProjectId').value = projectId;
+                    editModal.querySelector('#editProjectName').value = projectName;
+                    editModal.querySelector('#editProjectUrl').value = projectUrl;
+                });
 
-                        const editModal = document.getElementById("editProject");
-                        let editButton = null;
+                const deleteModal = document.getElementById('deleteProject');
+                deleteModal.addEventListener('show.bs.modal', event => {
+                    const button = event.relatedTarget;
+                    const projectId = button.getAttribute('data-id');
+                    const projectName = button.getAttribute('data-name');
+                    const projectUrl = button.getAttribute('data-url');
 
-                        if (!editModal) {
-                            return;
+                    deleteModal.querySelector('#deleteProjectId').value = projectId;
+                    deleteModal.querySelector('#deleteProjectName').textContent = projectName;
+                    deleteModal.querySelector('#deleteProjectUrl').textContent = projectUrl;
+
+                });
+            });
+        </script>
+
+        <script>
+            function refreshTestCount() {
+                fetch('/testrequest/count')
+                    .then(response => response.json())
+                    .then(count => {
+                        document.getElementById("testCount").textContent = tests.count;
+                        document.getElementById("userCount").textContent = users.count;
+                    })
+                    .catch(error => console.error("Error fetching count:", error));
+            }
+            // Intercept form submit
+            document.getElementById("testForm").addEventListener("submit", function (e) {
+                e.preventDefault(); // stop normal form submit
+
+                const formData = new FormData(this);
+
+                fetch(this.action, {
+                    method: this.method,
+                    body: formData
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            refreshTestCount(); // update count immediately
                         }
+                    })
+                    .catch(error => console.error("Error saving test:", error));
+            });
 
-                        editModal.addEventListener("show.bs.modal", function (event) {
 
-                            editButton = event.relatedTarget;
 
-                        });
+            // Initial load
+            refreshTestCount();
 
-                        editModal.addEventListener("hide.bs.modal", function () {
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
 
-                            // Remove focus before Bootstrap sets aria-hidden="true"
-                            if (document.activeElement &&
-                                editModal.contains(document.activeElement)) {
+                const editModal = document.getElementById("editProject");
 
-                                document.activeElement.blur();
-                            }
+                if (editModal) {
 
-                        });
+                    editModal.addEventListener("show.bs.modal", function (event) {
 
-                        editModal.addEventListener("hide.bs.modal", function () {
+                        const button = event.relatedTarget;
 
-                            // Return focus to the button that opened the modal
-                            if (editButton) {
-                                editButton.focus();
-                            }
+                        const projectId = button.getAttribute("data-id");
+                        const projectName = button.getAttribute("data-name");
+                        const projectUrl = button.getAttribute("data-url");
 
-                        });
+                        console.log("Edit project ID:", projectId);
+                        console.log("Edit project name:", projectName);
+                        console.log("Edit project URL:", projectUrl);
 
+                        document.getElementById("editProjectId").value = projectId;
+                        document.getElementById("editProjectName").value = projectName;
+                        document.getElementById("editProjectUrl").value = projectUrl;
                     });
-                </script>
+                }
+
+            });
+        </script>
 
 
 
-
-                <script>
-                    function loadProjectCards() {
-
-                        fetch('/project-cards')
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error("Failed to load projects");
-                                }
-
-                                return response.json();
-                            })
-                            .then(projects => {
-
-                                const container =
-                                    document.getElementById("project-container");
-
-                                container.innerHTML = "";
-
-                                projects.forEach(project => {
-
-                                    const card = `
-                        <div class="col-12 col-sm-6 col-xxl-3 col-lg-4 p-b-24"
-                             data-project-id="${project.projectId}"
-                             data-project-name="${encodeURIComponent(project.projectName)}">
-
-                            <div class="card project-card shadow-sm"
-                                 style="cursor:pointer;">
-
-                                <div class="card-body">
-
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-
-                                        <p class="mb-0 para-f1 dmsans-medium text-color1">
-                                            ${project.projectName}
-                                        </p>
-
-                                        <div class="dropdown">
-
-                                            <a class="btn btn-sm"
-                                               href="#"
-                                               data-bs-toggle="dropdown"
-                                               onclick="event.stopPropagation();">
-
-                                                <i class="fa-solid fa-ellipsis-vertical text-color4"></i>
-
-                                            </a>
-
-                                            <ul class="dropdown-menu dropdown-menu-end py-3 px-0">
-
-                                                <li class="m-b-16 ps-3">
-
-                                                    <a class="dropdown-item edit-project-btn"
-                                                       href="#"
-                                                       data-bs-toggle="modal"
-                                                       data-bs-target="#editProject"
-                                                       data-project-id="${project.projectId}"
-                                                       onclick="event.stopPropagation();">
-
-                                                        <img src="assets/images/edit-icon.svg"
-                                                             class="me-2">
-
-                                                        Edit
-                                                    </a>
-
-                                                </li>
-
-                                                <li class="ps-3">
-
-                                                    <a class="dropdown-item delete-project-btn"
-   href="#"
-   data-bs-toggle="modal"
-   data-bs-target="#deleteProject"
-   data-project-id="${project.projectId}"
-   data-project-name="${encodeURIComponent(project.projectName)}"
-   onclick="event.stopPropagation();">
-
-    <img src="assets/images/delete-icon.svg" class="me-2">
-
-    Delete
-</a>
-
-
-                                                </li>
-
-                                            </ul>
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="d-flex justify-content-between align-items-center project-info custom-border p-b-8">
-
-                                        <div class="d-flex align-items-center gap-1">
-
-                                            <img src="assets/images/test-cases.svg"
-                                                 class="me-1">
-
-                                            <span class="head-h4">
-                                                ${project.testCases}
-                                            </span>
-
-                                            <span class="para-f4">
-                                                Test Cases
-                                            </span>
-
-                                        </div>
-
-                                        <div class="d-flex align-items-center gap-1">
-
-                                            <img src="assets/images/user-list-icon.svg"
-                                                 class="me-1">
-
-                                            <span class="head-h4">
-                                                ${project.users}
-                                            </span>
-
-                                            <span class="para-f4">
-                                                Users
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="d-flex justify-content-between flex-wrap card-footer-custom p-t-8">
-
-                                        <span class="para-f4 text-color4">
-                                            Created by ${project.createdBy}
-                                        </span>
-
-                                        <span class="para-f4 text-color4">
-                                            ${project.createdAt}
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-                    `;
-
-                                    container.insertAdjacentHTML("beforeend", card);
-                                });
-                            })
-                            .catch(error => {
-                                console.error("Error loading projects:", error);
-                            });
-                    }
-
-                    document.addEventListener("DOMContentLoaded", function () {
-                        loadProjectCards();
-                    });
-                </script>
-
-                <script>
-                    function refreshTestCount() {
-                        fetch('/testrequest/count')
-                            .then(response => response.json())
-                            .then(count => {
-                                document.getElementById("testCount").textContent = tests.count;
-                                document.getElementById("userCount").textContent = users.count;
-                            })
-                            .catch(error => console.error("Error fetching count:", error));
-                    }
-                    // Intercept form submit
-                    document.getElementById("testForm").addEventListener("submit", function (e) {
-                        e.preventDefault(); // stop normal form submit
-
-                        const formData = new FormData(this);
-
-                        fetch(this.action, {
-                            method: this.method,
-                            body: formData
-                        })
-                            .then(response => {
-                                if (response.ok) {
-                                    refreshTestCount(); // update count immediately
-                                }
-                            })
-                            .catch(error => console.error("Error saving test:", error));
-                    });
-
-
-
-                    // Initial load
-                    refreshTestCount();
-
-                </script>
-
-                <script th:src="@{assets/js/bootstrap.bundle.min.js}"></script>
-                <script th:src="@{assets/js/jquery.min.js}"></script>
-                <script th:src="@{assets/js/tw-scripts.js}"></script>
+        <script th:src="@{assets/js/bootstrap.bundle.min.js}"></script>
+        <script th:src="@{assets/js/jquery.min.js}"></script>
+        <script th:src="@{assets/js/tw-scripts.js}"></script>
 </body>
 
 </html>

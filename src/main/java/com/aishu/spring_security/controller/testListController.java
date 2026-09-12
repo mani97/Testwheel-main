@@ -4,12 +4,13 @@ import com.aishu.spring_security.Dto.ProjectCardDTO;
 import com.aishu.spring_security.Repository.ProjectRepository;
 import com.aishu.spring_security.Repository.TestRepository;
 import com.aishu.spring_security.Repository.UserRepo;
-
+import com.aishu.spring_security.controller.Mapper.Mapper;
 import com.aishu.spring_security.model.Project;
 
 import com.aishu.spring_security.model.User;
 import com.aishu.spring_security.service.ProjectService;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +20,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,92 +49,75 @@ public class testListController {
         @Autowired
         ProjectRepository projectRepository;
 
+        @GetMapping("/projectcard")
+        public String createcard(Model model) {
+                List<Project> projects = projectRepo.findAll();
+                model.addAttribute("projects", projects);
+                return "project-list";
+        }
+
+        @GetMapping("/project-cards")
+        @ResponseBody
+        @Transactional
+        public List<com.aishu.spring_security.Dto.ProjectCardDTO> getProjectCards(Authentication authentication) {
+                User currentUser = userRepository
+                                .findByUsername(authentication.getName())
+                                .orElseThrow();
+                List<Project> projects = projectRepo.findByCreatedBy(currentUser);
+
+                return projects.stream().map(p -> new com.aishu.spring_security.Dto.ProjectCardDTO(
+                                p.getProjectId(),
+                                p.getProjectName(),
+                                p.getTests() != null ? p.getTests().size() : 0,
+                                p.getUsername() != null ? 1 : 0,
+                                p.getCreatedBy() != null ? p.getCreatedBy().getFirstName() : "",
+                                p.getCreatedAt(),
+                                p.getProjectUrl()))
+                                .collect(java.util.stream.Collectors.toList());
+        }
+
         @GetMapping("/testlist")
         public String ProjectList(@RequestParam(defaultValue = "newest") String sort,
                         @RequestParam(required = false) List<Long> createdBy,
                         Authentication authentication,
                         Model model) {
-                // /*
-                // * Get currently authenticated user
-                // */
-                // User currentUser = userRepository
-                // .findByUsername(authentication.getName())
-                // .orElseThrow();
 
-                // /*
-                // * Get users if you still need them for the filter
-                // */
-                // List<User> users = userRepository.findAll();
+                User currentUser = userRepository.findByUsername(authentication.getName())
+                                .orElseThrow();
 
-                // model.addAttribute("currentUser", currentUser);
-                // model.addAttribute("users", users);
+                List<User> users = userRepository.findAll();
+                model.addAttribute("currentUser", currentUser);
+                model.addAttribute("users", users);
+                model.addAttribute("selectedSort", sort);
+                model.addAttribute("selectedCreatedBy", createdBy != null ? createdBy : Collections.emptyList());
 
-                // model.addAttribute("selectedSort", sort);
+                // Get projects created by current user
+                List<Project> projects = projectRepository.findByCreatedBy(currentUser);
 
-                // model.addAttribute(
-                // "selectedCreatedBy",
-                // createdBy != null ? createdBy : Collections.emptyList());
+                // Apply "Created By" filter if selected
+                if (createdBy != null && !createdBy.isEmpty()) {
+                        projects = projects.stream()
+                                        .filter(p -> p.getCreatedBy() != null
+                                                        && createdBy.contains((long) p.getCreatedBy().getId()))
+                                        .collect(Collectors.toList());
+                }
 
-                // /*
-                // * IMPORTANT:
-                // *
-                // * Get ONLY projects created by
-                // * the authenticated user.
-                // */
-                // List<Project> projects = projectRepository.findByCreatedBy(currentUser);
-                // /*
-                // * Convert projects to DTOs
-                // */
-                // List<ProjectCardDTO> projectCardUserSpecific = projects
-                // .stream()
-                // .map(project -> {
+                // Apply sorting
+                switch (sort) {
+                        case "oldest" -> projects.sort(Comparator.comparing(Project::getCreatedAt));
+                        case "nameAsc" -> projects.sort(
+                                        Comparator.comparing(Project::getProjectName, String.CASE_INSENSITIVE_ORDER));
+                        case "nameDesc" -> projects.sort(Comparator
+                                        .comparing(Project::getProjectName, String.CASE_INSENSITIVE_ORDER).reversed());
+                        default -> projects.sort(Comparator.comparing(Project::getCreatedAt).reversed()); // newest
+                }
 
-                // ProjectCardDTO dto = new ProjectCardDTO();
+                // Convert to DTOs
+                List<ProjectCardDTO> projectCardUserSpecific = projects.stream()
+                                .map(Mapper::toProjectCardDto)
+                                .collect(Collectors.toList());
 
-                // dto.setProjectName(project.getProjectName());
-
-                // dto.setTestCases(project.getTests() != null
-                // ? project.getTests().size()
-                // : 0);
-
-                // dto.setUsers(project.getUsername() != null ? 1 : 0);
-
-                // dto.setCreatedBy(project.getCreatedBy() != null
-                // ? project.getCreatedBy().getUsername()
-                // : "");
-
-                // dto.setCreatedAt(project.getCreatedAt());
-
-                // return dto;
-                // })
-                // .collect(Collectors.toList());
-
-                // model.addAttribute(
-                // "projectCards",
-                // projectCardUserSpecific);
-
-                long testCount = testRepository.count();
-                long userCount = userRepository.count();
-                model.addAttribute("testCount", testCount);
-                model.addAttribute("userCount", userCount);
-
-                // Build project cards only for tests that have a linked project
-                List<ProjectCardDTO> projectCards = testRepository.findAll().stream()
-                                .filter(test -> test.getProject() != null)
-                                .map(test -> {
-                                        ProjectCardDTO dto = new ProjectCardDTO();
-                                        dto.setProjectName(test.getProject().getProjectName());
-                                        dto.setTestCases(test.getProject().getTests() != null
-                                                        ? test.getProject().getTests().size()
-                                                        : 0);
-                                        dto.setUsers(test.getProject().getUsername() != null ? 1 : 0);
-                                        dto.setCreatedBy(test.getProject().getCreatedBy() != null
-                                                        ? test.getProject().getCreatedBy().getUsername()
-                                                        : "");
-                                        dto.setCreatedAt(test.getProject().getCreatedAt());
-                                        return dto;
-                                }).collect(Collectors.toList());
-                model.addAttribute("projectCards", projectCards);
+                model.addAttribute("projectCards", projectCardUserSpecific);
 
                 return "project-list";
         }
@@ -145,11 +131,24 @@ public class testListController {
                 return counts;
         }
 
-        @DeleteMapping("/projects/{projectId}")
+        @PostMapping("/projects/update")
+        public String updateProject(@RequestParam int projectId,
+                        @RequestParam String projectName,
+                        @RequestParam String projectUrl) {
+                System.out.println("projectId :" + projectId);
+                Project project = projectRepository.findById(projectId)
+                                .orElseThrow(() -> new IllegalArgumentException("Invalid project ID"));
+                project.setProjectName(projectName);
+                project.setProjectUrl(projectUrl);
+                projectRepository.save(project);
+                return "redirect:/testlist";
+        }
+
+        @PostMapping("/projects/delete")
         @ResponseBody
         @Transactional
-        public ResponseEntity<?> deleteProject(
-                        @PathVariable int projectId,
+        public String deleteProject(
+                        @RequestParam int projectId,
                         Authentication authentication) {
 
                 User currentUser = userRepository
@@ -162,19 +161,10 @@ public class testListController {
                 // IMPORTANT: only allow the owner to delete their project
                 if (project.getCreatedBy() == null ||
                                 project.getCreatedBy().getId() != currentUser.getId()) {
-
-                        return ResponseEntity.status(403)
-                                        .body(Map.of(
-                                                        "success", false,
-                                                        "message", "You are not allowed to delete this project"));
+                        throw new AccessDeniedException("You are not allowed to delete this project");
                 }
 
                 projectRepository.delete(project);
-
-                return ResponseEntity.ok(
-                                Map.of(
-                                                "success", true,
-                                                "message", "Project deleted successfully"));
+                return "testlist";
         }
-
 }

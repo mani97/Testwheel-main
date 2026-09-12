@@ -1,11 +1,17 @@
 package com.aishu.spring_security.controller.Mapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.aishu.spring_security.Dto.APITestingDto;
 import com.aishu.spring_security.Dto.MobileTestingDto;
+import com.aishu.spring_security.Dto.ProjectCardDTO;
 import com.aishu.spring_security.Dto.Step2formDto;
 import com.aishu.spring_security.Dto.TestEntityDto;
 import com.aishu.spring_security.Dto.WebTestingDto;
 import com.aishu.spring_security.model.TestEntity;
+import com.aishu.spring_security.model.User;
+import com.aishu.spring_security.model.Project;
 
 public class Mapper {
 
@@ -75,6 +81,35 @@ public class Mapper {
         step2formDto.setTag(dto.getTag());
         step2formDto.setDescription(dto.getDescription());
         return step2formDto;
+    }
+
+    public static ProjectCardDTO toProjectCardDto(Project projects) {
+        ProjectCardDTO projectCardDto = new ProjectCardDTO();
+        projectCardDto.setProjectId(projects.getProjectId());
+        projectCardDto.setProjectName(projects.getProjectName());
+        projectCardDto.setProjectUrl(projects.getProjectUrl());
+        projectCardDto.setTestCases(projects.getTests() != null ? projects.getTests().size() : 0);
+        projectCardDto.setUsers(projects.getUsername() != null ? 1 : 0);
+        projectCardDto.setCreatedBy(projects.getCreatedBy() != null ? projects.getCreatedBy().getFirstName() : "");
+        projectCardDto.setCreatedAt(projects.getCreatedAt());
+        return projectCardDto;
+    }
+
+    // public static Project toProject(ProjectCardDTO projectCardDto) {
+    // Project project = new Project();
+    // project.setProjectId(projectCardDto.getProjectId());
+    // project.setProjectName(projectCardDto.getProjectName());
+    // project.setProjectUrl(projectCardDto.getProjectUrl());
+    // project.setCreatedAt(projectCardDto.getCreatedAt());
+
+    // project.setCreatedBy(User user);
+    // return project;
+    // }
+
+    public static List<ProjectCardDTO> toProjectCardDto(List<Project> projects) {
+        return projects.stream()
+                .map(Mapper::toProjectCardDto) // reuse single mapper
+                .collect(Collectors.toList());
     }
 
 }

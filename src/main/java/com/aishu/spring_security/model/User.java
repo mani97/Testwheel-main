@@ -6,11 +6,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-@Data
 @Table(name = "users")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class User {
 
     @Id
@@ -53,6 +53,10 @@ public class User {
     private boolean onboardingCompleted = false;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties({"user", "hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({ "user", "hibernateLazyInitializer", "handler" })
     private WizardSetup wizardSetup;
+
+    public String getFirstName() {
+        return this.firstName;
+    }
 }
