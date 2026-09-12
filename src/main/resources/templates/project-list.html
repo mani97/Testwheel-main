@@ -12,6 +12,60 @@
     <link th:href="@{assets/css/after-login-styles.css}" rel="stylesheet">
     <link th:href="@{assets/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{assets/fontawesome/css/all.min.css}" rel="stylesheet">
+
+    <!-- Notification dropdown styles -->
+    <style>
+        .notification-dropdown {
+            width: 600px !important;
+            max-width: 90vw;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 0 !important;
+        }
+
+        .notification-dropdown.show {
+            display: flex !important;
+        }
+
+        /* Fixed header */
+        .notification-header {
+            flex: 0 0 auto;
+            background: #fff;
+        }
+
+        /* Fixed-height notification area */
+        .notification-list {
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Fixed footer */
+        .notification-footer {
+            flex: 0 0 auto;
+            background: #fff;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        /* Optional scrollbar styling */
+        .notification-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .notification-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .notification-list::-webkit-scrollbar-thumb {
+            background: #c5c5c5;
+            border-radius: 10px;
+        }
+
+        .notification-list::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+    </style>
 </head>
 
 <body>
@@ -322,51 +376,102 @@
 
         <script>
             function loadNotifications() {
+                console.log("▶️ Starting to load notifications...");
+
                 fetch('/notifications')
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log("📡 Fetch response status:", response.status);
+                        return response.json();
+                    })
                     .then(data => {
-                        let dropdown = document.getElementById('notificationDropdown');
-                        dropdown.innerHTML = ""; // clear old items
+                        console.log("✅ Notifications data received:", data);
 
-                        // Header
+                        const dropdown = document.getElementById('notificationDropdown');
+                        dropdown.innerHTML = "";
+
+                        // =========================
+                        // HEADER
+                        // =========================
                         dropdown.innerHTML += `
-                          <div class="d-flex justify-content-between px-4 brdr-btm-1 py-3">
-                            <div class="col-sm-6">
-                              <p class="para-f3 dmsans-semibold text-color1">
-                                Notifications <span class="badge badge-circle">${data.length}</span>
-                              </p>
-                            </div>
-                            <div class="col-sm-6 text-end">
-                              <p class="para-f3 text-color3 dmsans-semibold"><a href="#">Mark all as read</a></p>
-                            </div>
-                          </div>`;
+          <div class="notification-header d-flex justify-content-between px-4 py-3 brdr-btm-1">
+            <div class="col-sm-6">
+              <p class="para-f3 dmsans-semibold text-color1 mb-0">
+                Notifications
+                <span class="badge badge-circle">${data.length}</span>
+              </p>
+            </div>
+            <div class="col-sm-6 text-end">
+              <a href="#" id="markAllRead" class="para-f3 text-color3 dmsans-semibold">
+                Mark all as read
+              </a>
+            </div>
+          </div>
+        `;
 
-                        // Loop notifications
-                        data.forEach(note => {
-                            dropdown.innerHTML += `
-                              <div class="brdr-btm-1 d-flex bg-color2 p-3">
-                                <div class="col-auto"><img src="/assets/images/test-execution.svg" alt="Icon" /></div>
-                                <div class="col-11">
-                                  <p class="para-f4 dmsans-semibold px-3 text-color1">${note.title}
-                                    <span class="dot bg-color3 ms-1 mt-2"></span>
-                                  </p>
-                                  <p class="para-f4 px-3 text-color6">${note.message}</p>
-                                  <p class="para-f4 px-3 text-color6">${note.timeAgo}</p>
-                                </div>
-                              </div>`;
-                        });
+                        // =========================
+                        // SCROLLABLE NOTIFICATION LIST
+                        // =========================
+                        const notificationList = document.createElement('div');
+                        notificationList.className = 'notification-list';
 
-                        // Footer
+                        if (!data || data.length === 0) {
+                            console.log("ℹ️ No notifications found.");
+                            notificationList.innerHTML = `
+            <div class="p-4 text-center">
+              <p class="para-f4 text-color6 mb-0">No notifications</p>
+            </div>
+          `;
+                        } else {
+                            console.log(`📋 Rendering ${data.length} notifications...`);
+                            data.forEach(note => {
+                                notificationList.innerHTML += `
+              <div class="brdr-btm-1 d-flex bg-color2 p-3">
+                <div class="col-auto">
+                  <img src="/assets/images/test-execution.svg" alt="Icon" />
+                </div>
+                <div class="col-11">
+                  <p class="para-f4 dmsans-semibold px-3 text-color1 mb-1">
+                    ${note.title}
+                    <span class="dot bg-color3 ms-1 mt-2"></span>
+                  </p>
+                  <p class="para-f4 px-3 text-color6 mb-1">${note.message}</p>
+                  <p class="para-f4 px-3 text-color6 mb-0">${note.timeAgo}</p>
+                </div>
+              </div>
+            `;
+                            });
+                        }
+
+                        dropdown.appendChild(notificationList);
+
+                        // =========================
+                        // FOOTER
+                        // =========================
                         dropdown.innerHTML += `
-                          <div class="py-3 px-3">
-                            <a class="dropdown-item text-color3 dmsans-semibold text-center" href="#">View all notifications</a>
-                          </div>`;
+          <div class="notification-footer py-3 px-3">
+            <a class="dropdown-item text-color3 dmsans-semibold text-center" href="/notificationsall">
+              View all notifications
+            </a>
+          </div>
+        `;
 
-                        // update badge count
-                        document.getElementById('notificationBadge').textContent = data.length;
+                        // =========================
+                        // UPDATE BADGE
+                        // =========================
+                        const badge = document.getElementById('notificationBadge');
+                        if (badge) {
+                            badge.textContent = data.length;
+                            console.log("🔔 Badge updated with count:", data.length);
+                        }
+
+                        console.log("✅ Notifications rendered successfully.");
+                    })
+                    .catch(error => {
+                        console.error("❌ Error loading notifications:", error);
                     });
             }
         </script>
+
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const editModal = document.getElementById('editProject');

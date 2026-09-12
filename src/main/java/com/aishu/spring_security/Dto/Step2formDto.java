@@ -10,12 +10,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Step2formDto {
 
+    @Size(max = 250, message = "Test case name must be less than 100 characters!!")
     private String testName;
 
+    @Size(max = 250, message = "Modules must be less than 100 characters!!")
     private String modules;
+
+    @Size(max = 250, message = "Tag must be less than 100 characters!!")
     private String tag;
 
-    @Size(max = 50, message = "Description must be less than 250 characters")
+    @Size(max = 250, message = "Description must be less than 250 characters!!")
     private String description;
 
 }

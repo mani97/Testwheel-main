@@ -34,5 +34,6 @@ public class Notification {
     private LocalDateTime timeAgo;
     private String title;
     private String message;
+    private boolean read = false;
 
 }

@@ -145,7 +145,7 @@ public class testListController {
         }
 
         @PostMapping("/projects/delete")
-        @ResponseBody
+
         @Transactional
         public String deleteProject(
                         @RequestParam int projectId,
@@ -165,6 +165,6 @@ public class testListController {
                 }
 
                 projectRepository.delete(project);
-                return "testlist";
+                return "redirect:/testlist";
         }
 }

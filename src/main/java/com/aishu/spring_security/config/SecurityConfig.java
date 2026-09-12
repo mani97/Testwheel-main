@@ -113,7 +113,7 @@ public class SecurityConfig {
                         .permitAll())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .invalidSessionUrl("/err")
+                        .invalidSessionUrl("/timeout")
                         .maximumSessions(1)
                         .sessionRegistry(sessionRegistry)
                         .expiredUrl("/timeout"))

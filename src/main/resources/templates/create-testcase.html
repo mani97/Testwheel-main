@@ -24,6 +24,7 @@
     <link th:href="@{assets/fontawesome/css/all.min.css}" rel="stylesheet">
 
     <!-- Project dropdown styles -->
+    <!-- Project dropdown styles -->
     <style>
         .dropdown-menu.custom-dropdown {
             display: none;
@@ -55,33 +56,49 @@
             display: none;
             flex-direction: column;
             overflow: hidden;
+            padding: 0 !important;
         }
 
         .notification-dropdown.show {
             display: flex !important;
         }
 
+        /* Fixed header */
         .notification-header {
-            flex-shrink: 0;
+            flex: 0 0 auto;
             background: #fff;
         }
 
+        /* Fixed-height notification area */
         .notification-list {
-            max-height: 400px;
+            max-height: 300px;
             overflow-y: auto;
+            overflow-x: hidden;
         }
 
+        /* Fixed footer */
         .notification-footer {
-            flex-shrink: 0;
+            flex: 0 0 auto;
             background: #fff;
             border-top: 1px solid #e5e5e5;
         }
 
-        #notificationDropdown .notification-list {
-            max-height: 300px;
-            /* adjust height */
-            overflow-y: auto;
-            /* adds scrollbar */
+        /* Optional scrollbar styling */
+        .notification-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .notification-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .notification-list::-webkit-scrollbar-thumb {
+            background: #c5c5c5;
+            border-radius: 10px;
+        }
+
+        .notification-list::-webkit-scrollbar-thumb:hover {
+            background: #999;
         }
     </style>
     <style>
@@ -134,7 +151,7 @@
                         fetch('/projects/selected')
                             .then(response => response.json())
                             .then(sessionData => {
-                                selectedProjectId = sessionData.selectedProjectId || null;
+                                selectedProjectId = sessionData.selectedProjectId || 0;
                                 selectedProjectName = sessionData.selectedProjectName || null;
                                 return fetch('/projects');
                             })
@@ -147,6 +164,11 @@
                             .then(data => {
 
                                 projectsData = data;
+                                //  If no projects exist, redirect to create project page
+                                if (!projectsData || projectsData.length === 0) {
+                                    window.location.href = "/createproject";
+                                    return;
+                                }
 
                                 // Determine selected project based on stored ID
                                 if (selectedProjectId != null) {
@@ -1502,200 +1524,7 @@
         </script>
 
 
-        <script>
-            function submitBothForms() {
-                let valid = true;
 
-                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
-                const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
-
-                // Collect inputs
-                const testName = document.getElementById('productName')?.value || '';
-                const modules = document.getElementById('modules')?.value || '';
-                const tag = document.getElementById('tagInput')?.value || '';
-                const description = document.getElementById('description')?.value || '';
-                const websiteUrl = document.getElementById('websiteUrl')?.value || '';
-                const backendApiTest = document.getElementById('backendApiTest')?.checked || false;
-                const apiProtocol = document.getElementById('APIprotocol')?.value || 'HTTP / REST';
-
-                // Collect file
-                const apkFile = document.getElementById('fileUpload')?.files[0];
-                // Project ID (only if selected)
-                // if (selectedProjectId) {
-                //     formData.append('projectId', selectedProjectId);
-                // }
-
-                // Use FormData for file + text
-                const formData1 = new FormData();
-                const formData2 = new FormData();
-                const formData3 = new FormData();
-                if (selectedItem == 'Web Testing') {
-                    formData1.append('testName', testName);
-                    formData1.append('modules', modules);
-                    formData1.append('tag', tag);
-                    formData1.append('description', description);
-                    formData1.append('websiteUrl', websiteUrl);
-                    formData1.append('backendApiTest', backendApiTest);
-                    formData1.append('projectId', selectedProjectId);
-                    // POST to /createtest
-                    fetch('/createtest1', {
-                        method: 'POST',
-                        headers: {
-                            [csrfHeader]: csrfToken
-                            // ⚠️ Do NOT set Content-Type manually; browser sets it with boundary
-                        },
-                        body: formData1,
-                        credentials: 'include'
-                    })
-                        .then(async response => {
-                            const contentType = response.headers.get('content-type');
-                            let data;
-
-                            if (contentType && contentType.includes('application/json')) {
-                                data = await response.json();
-                                console.log("Backend json response:", data);
-                            } else {
-                                data = await response.text();
-                                console.log("Backend text response:", data);
-                            }
-                            if (!response.ok) {
-                                // Validation errors
-                                console.log("Backend validation response:", data);
-
-                                if (response.status === 400 && typeof data === 'object') {
-                                    displayValidationErrors(data);
-                                } else {
-                                    console.error("Backend returned:", data);
-                                    const message =
-                                        typeof data === 'object' && data.message
-                                            ? data.message
-                                            : 'Something went wrong while creating the test.';
-
-                                    //alert(message);
-                                }
-                                return;
-                            } if (data.success) {
-                                window.location.href = '/create-testcase';
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Upload failed:", error);
-                        });
-
-
-                }
-                else if (selectedItem == 'Mobile Testing') {
-                    formData2.append('testName', testName);
-                    formData2.append('modules', modules);
-                    formData2.append('tag', tag);
-                    formData2.append('description', description);
-                    formData2.append('backendApiTest', backendApiTest);
-                    formData2.append('APIprotocol', apiProtocol);
-                    formData2.append('projectId', selectedProjectId);
-                    if (apkFile) {
-                        formData2.append('apk', apkFile);
-                    }
-                    // POST to /createtest
-                    fetch('/createtest2', {
-                        method: 'POST',
-                        headers: {
-                            [csrfHeader]: csrfToken
-                            // ⚠️ Do NOT set Content-Type manually; browser sets it with boundary
-                        },
-                        body: formData2,
-                        credentials: 'include'
-                    })
-                        .then(async response => {
-                            const contentType = response.headers.get('content-type');
-                            let data;
-
-                            if (contentType && contentType.includes('application/json')) {
-                                data = await response.json();
-                                console.log("Backend json response:", data);
-                            } else {
-                                data = await response.text();
-                                console.log("Backend text response:", data);
-                            }
-                            if (!response.ok) {
-                                // Validation errors
-                                console.log("Backend validation response:", data);
-
-                                if (response.status === 400 && typeof data === 'object') {
-                                    displayValidationErrors(data);
-                                } else {
-                                    console.error("Backend returned:", data);
-                                    const message =
-                                        typeof data === 'object' && data.message
-                                            ? data.message
-                                            : 'Something went wrong while creating the test.';
-
-                                    //alert(message);
-                                }
-                                return;
-                            } if (data.success) {
-                                valid = true;
-                                window.location.href = '/create-testcase';
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Upload failed:", error);
-                        });
-                }
-                else if (selectedItem == 'API Testing') {
-                    formData3.append('testName', testName);
-                    formData3.append('modules', modules);
-                    formData3.append('tag', tag);
-                    formData3.append('description', description);
-                    formData3.append('APIprotocol', apiProtocol);
-                    formData3.append('projectId', selectedProjectId);
-                    // POST to /createtest
-                    fetch('/createtest3', {
-                        method: 'POST',
-                        headers: {
-                            [csrfHeader]: csrfToken
-                            // ⚠️ Do NOT set Content-Type manually; browser sets it with boundary
-                        },
-                        body: formData3,
-                        credentials: 'include'
-                    })
-                        .then(async response => {
-                            const contentType = response.headers.get('content-type');
-                            let data;
-
-                            if (contentType && contentType.includes('application/json')) {
-                                data = await response.json();
-                                console.log("Backend json response:", data);
-                            } else {
-                                data = await response.text();
-                                console.log("Backend text response:", data);
-                            }
-                            if (!response.ok) {
-                                // Validation errors
-                                console.log("Backend validation response:", data);
-
-                                if (response.status === 400 && typeof data === 'object') {
-                                    displayValidationErrors(data);
-                                } else {
-                                    console.error("Backend returned:", data);
-                                    const message =
-                                        typeof data === 'object' && data.message
-                                            ? data.message
-                                            : 'Something went wrong while creating the test.';
-
-                                    //alert(message);
-                                }
-                                return;
-                            } if (data.success) {
-                                window.location.href = '/create-testcase';
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Upload failed:", error);
-                        });
-                }
-
-            }
-        </script>
 
 
         <!-- display that error into html -->
@@ -1866,59 +1695,275 @@
                 // SUBMIT
                 // =========================
                 if (valid) {
+                    console.log("✅ Validation passed — submitting forms now...");
                     submitBothForms();
+                } else {
+                    console.log("❌ Validation failed — fix the errors first.");
                 }
             }
+        </script>
+
+        <script>
+            function submitBothForms() {
+                console.log("▶️ Starting submitBothForms...");
+
+                let valid = true;
+
+                // Use FormData for file + text
+                const formData1 = new FormData();
+                const formData2 = new FormData();
+                const formData3 = new FormData();
+
+                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+
+                // Collect inputs
+                const testName = document.getElementById('productName')?.value || '';
+                const modules = document.getElementById('modules')?.value || '';
+                const tag = document.getElementById('tagInput')?.value || '';
+                const description = document.getElementById('description')?.value || '';
+                const websiteUrl = document.getElementById('websiteUrl')?.value || '';
+                const backendApiTest = document.getElementById('backendApiTest')?.checked || false;
+                const apiProtocol = document.getElementById('APIprotocol')?.value || 'HTTP / REST';
+
+                const apkFile = document.getElementById('fileUpload')?.files[0];
+
+                console.log("Collected inputs:", { testName, modules, tag, description, websiteUrl, backendApiTest, apiProtocol, apkFile });
+
+                // Default project ID
+                const DEFAULT_PROJECT_ID = 1;
+                const projectIdToUse = selectedProjectId || DEFAULT_PROJECT_ID;
+                console.log("Using projectId:", projectIdToUse);
+
+                // =========================
+                // WEB TESTING
+                // =========================
+                if (selectedItem === 'Web Testing') {
+                    console.log("Preparing Web Testing formData...");
+                    formData1.append('testName', testName);
+                    formData1.append('modules', modules);
+                    formData1.append('tag', tag);
+                    formData1.append('description', description);
+                    formData1.append('websiteUrl', websiteUrl);
+                    formData1.append('backendApiTest', backendApiTest);
+                    formData1.append('projectId', projectIdToUse);
+
+                    fetch('/createtest1', {
+                        method: 'POST',
+                        headers: { [csrfHeader]: csrfToken },
+                        body: formData1,
+                        credentials: 'include'
+                    })
+                        .then(async response => {
+                            console.log("Web Testing response status:", response.status);
+                            const contentType = response.headers.get('content-type');
+                            let data = contentType && contentType.includes('application/json')
+                                ? await response.json()
+                                : await response.text();
+                            console.log("Web Testing backend response:", data);
+
+                            if (response.ok && data.success) {
+                                console.log("✅ Web Testing submission successful!");
+                                window.location.href = '/create-testcase';
+                            } else {
+                                console.error("❌ Web Testing submission failed:", data);
+                            }
+                        })
+                        .catch(error => console.error("Upload failed:", error));
+                }
+
+                // =========================
+                // MOBILE TESTING
+                // =========================
+                else if (selectedItem === 'Mobile Testing') {
+                    console.log("Preparing Mobile Testing formData...");
+                    formData2.append('testName', testName);
+                    formData2.append('modules', modules);
+                    formData2.append('tag', tag);
+                    formData2.append('description', description);
+                    formData2.append('backendApiTest', backendApiTest);
+                    formData2.append('APIprotocol', apiProtocol);
+                    formData2.append('projectId', projectIdToUse);
+                    if (apkFile) formData2.append('apk', apkFile);
+
+                    fetch('/createtest2', {
+                        method: 'POST',
+                        headers: { [csrfHeader]: csrfToken },
+                        body: formData2,
+                        credentials: 'include'
+                    })
+                        .then(async response => {
+                            console.log("Mobile Testing response status:", response.status);
+                            const contentType = response.headers.get('content-type');
+                            let data = contentType && contentType.includes('application/json')
+                                ? await response.json()
+                                : await response.text();
+                            console.log("Mobile Testing backend response:", data);
+
+                            if (response.ok && data.success) {
+                                console.log("✅ Mobile Testing submission successful!");
+                                window.location.href = '/create-testcase';
+                            } else {
+                                console.error("❌ Mobile Testing submission failed:", data);
+                            }
+                        })
+                        .catch(error => console.error("Upload failed:", error));
+                }
+
+                // =========================
+                // API TESTING
+                // =========================
+                else if (selectedItem === 'API Testing') {
+                    console.log("Preparing API Testing formData...");
+                    formData3.append('testName', testName);
+                    formData3.append('modules', modules);
+                    formData3.append('tag', tag);
+                    formData3.append('description', description);
+                    formData3.append('APIprotocol', apiProtocol);
+                    formData3.append('projectId', projectIdToUse);
+
+                    fetch('/createtest3', {
+                        method: 'POST',
+                        headers: { [csrfHeader]: csrfToken },
+                        body: formData3,
+                        credentials: 'include'
+                    })
+                        .then(async response => {
+                            console.log("API Testing response status:", response.status);
+                            const contentType = response.headers.get('content-type');
+                            let data = contentType && contentType.includes('application/json')
+                                ? await response.json()
+                                : await response.text();
+                            console.log("API Testing backend response:", data);
+
+                            if (response.ok && data.success) {
+                                console.log("✅ API Testing submission successful!");
+                                window.location.href = '/create-testcase';
+                            } else {
+                                console.error("❌ API Testing submission failed:", data);
+                            }
+                        })
+                        .catch(error => console.error("Upload failed:", error));
+                }
+            }
+
         </script>
 
 
 
         <script>
             function loadNotifications() {
+                console.log("▶️ Starting to load notifications...");
+
                 fetch('/notifications')
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log("📡 Fetch response status:", response.status);
+                        return response.json();
+                    })
                     .then(data => {
-                        let dropdown = document.getElementById('notificationDropdown');
-                        dropdown.innerHTML = ""; // clear old items
+                        console.log("✅ Notifications data received:", data);
 
-                        // Header
+                        const dropdown = document.getElementById('notificationDropdown');
+                        dropdown.innerHTML = "";
+
+                        // =========================
+                        // HEADER
+                        // =========================
                         dropdown.innerHTML += `
-                      <div class="d-flex justify-content-between px-4 brdr-btm-1 py-3">
-                        <div class="col-sm-6">
-                          <p class="para-f3 dmsans-semibold text-color1">
-                            Notifications <span class="badge badge-circle">${data.length}</span>
-                          </p>
-                        </div>
-                        <div class="col-sm-6 text-end">
-                          <p class="para-f3 text-color3 dmsans-semibold"><a href="#">Mark all as read</a></p>
-                        </div>
-                      </div>`;
+          <div class="notification-header d-flex justify-content-between px-4 py-3 brdr-btm-1">
+            <div class="col-sm-6">
+              <p class="para-f3 dmsans-semibold text-color1 mb-0">
+                Notifications
+                <span class="badge badge-circle">${data.length}</span>
+              </p>
+            </div>
+            <div class="col-sm-6 text-end">
+              <a href="#" id="markAllRead" class="para-f3 text-color3 dmsans-semibold">
+                Mark all as read
+              </a>
+            </div>
+          </div>
+        `;
 
-                        // Loop notifications
-                        data.forEach(note => {
-                            dropdown.innerHTML += `
-                          <div class="brdr-btm-1 d-flex bg-color2 p-3">
-                            <div class="col-auto"><img src="/assets/images/test-execution.svg" alt="Icon" /></div>
-                            <div class="col-11">
-                              <p class="para-f4 dmsans-semibold px-3 text-color1">${note.title}
-                                <span class="dot bg-color3 ms-1 mt-2"></span>
-                              </p>
-                              <p class="para-f4 px-3 text-color6">${note.message}</p>
-                              <p class="para-f4 px-3 text-color6">${note.timeAgo}</p>
-                            </div>
-                          </div>`;
-                        });
+                        // =========================
+                        // SCROLLABLE NOTIFICATION LIST
+                        // =========================
+                        const notificationList = document.createElement('div');
+                        notificationList.className = 'notification-list';
 
-                        // Footer
+                        if (!data || data.length === 0) {
+                            console.log("ℹ️ No notifications found.");
+                            notificationList.innerHTML = `
+            <div class="p-4 text-center">
+              <p class="para-f4 text-color6 mb-0">No notifications</p>
+            </div>
+          `;
+                        } else {
+                            console.log(`📋 Rendering ${data.length} notifications...`);
+                            data.forEach(note => {
+                                notificationList.innerHTML += `
+              <div class="brdr-btm-1 d-flex bg-color2 p-3">
+                <div class="col-auto">
+                  <img src="/assets/images/test-execution.svg" alt="Icon" />
+                </div>
+                <div class="col-11">
+                  <p class="para-f4 dmsans-semibold px-3 text-color1 mb-1">
+                    ${note.title}
+                    <span class="dot bg-color3 ms-1 mt-2"></span>
+                  </p>
+                  <p class="para-f4 px-3 text-color6 mb-1">${note.message}</p>
+                  <p class="para-f4 px-3 text-color6 mb-0">${note.timeAgo}</p>
+                </div>
+              </div>
+            `;
+                            });
+                        }
+
+                        dropdown.appendChild(notificationList);
+
+                        // =========================
+                        // FOOTER
+                        // =========================
                         dropdown.innerHTML += `
-                      <div class="py-3 px-3">
-                        <a class="dropdown-item text-color3 dmsans-semibold text-center" href="#" id="viewAllNotifications">View all notifications</a>
-                      </div>`;
+          <div class="notification-footer py-3 px-3">
+            <a class="dropdown-item text-color3 dmsans-semibold text-center" href="/notificationsall">
+              View all notifications
+            </a>
+          </div>
+        `;
 
-                        // update badge count
-                        document.getElementById('notificationBadge').textContent = data.length;
+                        // =========================
+                        // UPDATE BADGE
+                        // =========================
+                        const badge = document.getElementById('notificationBadge');
+                        if (badge) {
+                            badge.textContent = data.length;
+                            console.log("🔔 Badge updated with count:", data.length);
+                        }
+
+                        console.log("✅ Notifications rendered successfully.");
+                    })
+                    .catch(error => {
+                        console.error("❌ Error loading notifications:", error);
                     });
             }
+        </script>
+
+
+        <script>
+            document.addEventListener("click", function (e) {
+                if (e.target && e.target.textContent.includes("Mark all as read")) {
+                    e.preventDefault();
+                    fetch('/notifications/mark-all-read', { method: 'POST' })
+                        .then(response => response.text())
+                        .then(result => {
+                            if (result === "success") {
+                                // Optionally reload notifications
+                                loadNotifications();
+                            }
+                        });
+                }
+            });
         </script>
 
         <script th:src="@{assets/js/tw-scripts.js}"></script>

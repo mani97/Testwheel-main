@@ -6,6 +6,7 @@ import com.aishu.spring_security.model.Notification;
 import com.aishu.spring_security.model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -33,14 +34,13 @@ public class NotificationService {
         note.setMessage("User " + username + " signed up successfully");
         note.setTimeAgo(LocalDateTime.now()); // later you can calculate dynamically
         note.setUserid(getCurrentUser());
+        note.setRead(false);
         notificationRepository.save(note);
     }
 
     public List<Notification> getLatest() {
         User currentUser = getCurrentUser();
-        // Example: fetch last 10 notifications, ordered by timestamp
-
-        return notificationRepository.findByUseridOrderByTimeAgoDesc(currentUser);
+        return notificationRepository.findRecentByUserid(currentUser, PageRequest.of(0, 5));
     }
 
     public List<Notification> getAll() {
@@ -54,6 +54,7 @@ public class NotificationService {
         note.setMessage("User " + username + " logged in successfully");
         note.setTimeAgo(LocalDateTime.now()); // later you can calculate dynamically
         note.setUserid(getCurrentUser());
+        note.setRead(false);
         notificationRepository.save(note);
     }
 
@@ -63,7 +64,14 @@ public class NotificationService {
         note.setMessage("User " + username + " created a new testcase successfully");
         note.setTimeAgo(LocalDateTime.now()); // later you can calculate dynamically
         note.setUserid(getCurrentUser());
+        note.setRead(false);
         notificationRepository.save(note);
+    }
+
+    public void markAllAsRead(User user) {
+        List<Notification> notes = notificationRepository.findByUserid(user);
+        notes.forEach(note -> note.setRead(true));
+        notificationRepository.saveAll(notes);
     }
 
 }

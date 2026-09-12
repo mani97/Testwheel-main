@@ -1,7 +1,6 @@
 package com.aishu.spring_security.controller;
 
 import com.aishu.spring_security.Dto.ProjectDto;
-import com.aishu.spring_security.Dto.ProjectEditDto;
 import com.aishu.spring_security.Repository.UserRepo;
 import com.aishu.spring_security.dao.UserPrinciple;
 import com.aishu.spring_security.model.User;
