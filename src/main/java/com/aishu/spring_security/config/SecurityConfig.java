@@ -96,7 +96,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/signup", "/verify", "/check-email", "/login", "/assets/**", "/css/**",
                                 "/js/**",
                                 "/images/**", "/favicon.png", "/favicon.ico", "/forgot-password-phone", "/verify-otp",
-                                "/reset-password", "/createproject2", "/err")
+                                "/reset-password", "/createproject2", "/err", "/timeout")
                         .permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
@@ -113,7 +113,7 @@ public class SecurityConfig {
                         .permitAll())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .invalidSessionUrl("/timeout")
+                        .invalidSessionUrl("/err")
                         .maximumSessions(1)
                         .sessionRegistry(sessionRegistry)
                         .expiredUrl("/timeout"))
