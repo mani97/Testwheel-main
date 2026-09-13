@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -85,7 +86,8 @@ public class testListController {
                 User currentUser = userRepository.findByUsername(authentication.getName())
                                 .orElseThrow();
 
-                List<User> users = userRepository.findAll();
+                List<User> users = List.of(currentUser);
+
                 model.addAttribute("currentUser", currentUser);
                 model.addAttribute("users", users);
                 model.addAttribute("selectedSort", sort);

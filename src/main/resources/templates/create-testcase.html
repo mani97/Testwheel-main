@@ -540,7 +540,7 @@
                         onclick="loadNotifications()">
                         <!-- <i class="fa-regular fa-bell fs-4"></i> -->
                         <img th:src="@{/assets/images/bell-icon.svg}" alt="icon" />
-                        <span class="badge-dot"></span>
+                        <span class="badge-dot" id="notificationBadge"></span>
                     </div>
 
 
@@ -847,7 +847,7 @@
                                         <small id="moduleFeedback" class="d-block m-t-5">Select the module</small>
                                     </div>
 
-                                    <div class="p-t-16 module-wrapper">
+                                    <div id="tagContainer" class="p-t-16 module-wrapper">
                                         <label class="form-label">Tags</label>
                                         <input type="text" id="tagInput" th:field="*{tag}"
                                             class="form-control form-input"
@@ -857,13 +857,94 @@
                                         <small id="tagFeedback" class="d-block m-t-5">Select the tag</small>
                                     </div>
 
+                                    <script>
+                                        const tagInput = document.getElementById('tagInput');
+                                        const tagContainer = document.getElementById('tagContainer');
+
+                                        tagInput.addEventListener('keypress', function (event) {
+                                            if (event.key === 'Enter') {
+                                                event.preventDefault(); // prevent form submission
+
+                                                const value = tagInput.value.trim();
+                                                if (value) {
+                                                    // Create clickable tag element
+                                                    const tag = document.createElement('span');
+                                                    tag.className = 'tag';
+                                                    tag.textContent = value;
+
+                                                    // On click → append to input field
+                                                    tag.onclick = () => {
+                                                        if (tagInput.value.trim() === "") {
+                                                            tagInput.value = value;
+                                                        } else {
+                                                            tagInput.value += ", " + value;
+                                                        }
+                                                    };
+
+                                                    // Add remove button
+                                                    const removeBtn = document.createElement('button');
+                                                    removeBtn.innerHTML = '<i class="bi bi-x-circle-fill"></i>'; // nicer "×" symbol
+                                                    removeBtn.type = 'button';       // prevent form submission
+                                                    removeBtn.className = 'remove-btn';
+
+                                                    removeBtn.onclick = (e) => {
+                                                        e.stopPropagation(); // don’t trigger tag click
+                                                        tag.remove();
+                                                    };
+
+                                                    tag.appendChild(removeBtn);
+
+                                                    tagContainer.appendChild(tag);
+
+                                                    // Clear input
+                                                    tagInput.value = '';
+                                                }
+                                            }
+                                        });
+
+                                    </script>
+
+
+                                    <style>
+                                        .remove-btn {
+                                            margin-left: 8px;
+                                            border: none;
+                                            background: transparent;
+                                            cursor: pointer;
+                                            color: #888;
+                                            font-size: 16px;
+                                            transition: color 0.2s ease;
+                                        }
+
+                                        .remove-btn:hover {
+                                            color: #dc3545;
+                                            /* Bootstrap red */
+                                        }
+
+
+                                        .tag {
+                                            background: #e0e0e0;
+                                            padding: 5px 10px;
+                                            border-radius: 4px;
+                                            margin: 3px;
+                                            cursor: pointer;
+                                            border: none;
+                                        }
+
+                                        .tag:hover {
+                                            background: #d0d0d0;
+                                        }
+                                    </style>
+
+
                                     <div class="p-t-16">
                                         <label class="form-label">Description</label>
                                         <textarea id="description" th:field="*{description}"
                                             class="form-control form-input" rows="6" cols="50"
                                             placeholder="Describe what this test does..."></textarea>
-                                        <small id="descriptionFeedback" th:if="${#fields.hasErrors('description')}"
-                                            th:errors="*{description}" style="color:red; font-weight:bold;"></small>
+                                        <small id="descriptionThymeleafError"
+                                            th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
+                                            style="color:red; font-weight:bold;"></small>
                                         <small id="descriptionFeedback" class="d-block m-t-5">Enter the
                                             description</small>
                                     </div>
@@ -1552,6 +1633,16 @@
                     apiProtocol: 'APIprotocol'
                 };
 
+                const feedbackIdMap = {
+                    testName: 'testNameFeedback',
+                    modules: 'moduleFeedback',
+                    tag: 'tagFeedback',
+                    description: 'descriptionFeedback',
+                    websiteUrl: 'websiteUrlFeedback'
+                };
+
+                let hasStep2Errors = false;
+                let hasStep3Errors = false;
 
                 // Display new errors
                 Object.entries(errors).forEach(([field, message]) => {
@@ -1559,36 +1650,40 @@
                     const inputId = fieldIdMap[field] || field;
                     const input = document.getElementById(inputId);
 
-                    //const input = document.getElementById(field);
-                    const errorElement = document.getElementById(field + 'Feedback');
+                    const feedbackId = feedbackIdMap[field] || (field + 'Feedback') || (inputId + 'Feedback');
+                    let errorElement = document.getElementById(feedbackId);
 
-                    if (!input) {
-                        console.warn('No HTML element found for backend field:', field);
-                        return;
-                    }
                     if (input) {
                         // Red border
                         input.classList.add('is-invalid');
-                    } if (errorElement) {
+                    }
 
+                    if (errorElement) {
                         // Error message
                         errorElement.textContent = message;
-                        // Change only font color to red
+                        // Change font color to red
                         errorElement.style.color = 'red';
-                    };
-                    // errorMessage = document.createElement('small');
+                    } else if (input) {
+                        errorElement = document.createElement('small');
+                        errorElement.className = 'validation-error d-block m-t-5';
+                        errorElement.style.color = 'red';
+                        errorElement.textContent = message;
+                        input.insertAdjacentElement('afterend', errorElement);
+                    } else {
+                        console.warn('No HTML element found for backend field:', field);
+                    }
 
-                    // errorMessage.className =
-                    //     'validation-error d-block mt-1';
-
-                    // errorMessage.style.color = 'red';
-                    // errorMessage.style.fontWeight = 'bold';
-
-                    // errorMessage.textContent = errors[field];
-
-                    // // Put message immediately after input
-                    // input.insertAdjacentElement('afterend', errorMessage);
+                    if (['productName', 'modules', 'tagInput', 'description'].includes(inputId)) {
+                        hasStep2Errors = true;
+                    }
+                    if (['websiteUrl', 'fileUpload', 'APIprotocol'].includes(inputId)) {
+                        hasStep3Errors = true;
+                    }
                 });
+
+                if (hasStep2Errors && !hasStep3Errors) {
+                    goToStep(2);
+                }
             }
         </script>
 
@@ -1767,6 +1862,11 @@
                                 window.location.href = '/create-testcase';
                             } else {
                                 console.error("❌ Web Testing submission failed:", data);
+                                if (typeof data === 'object' && data !== null) {
+                                    displayValidationErrors(data);
+                                } else if (typeof data === 'string') {
+                                    alert(data);
+                                }
                             }
                         })
                         .catch(error => console.error("Upload failed:", error));
@@ -1805,6 +1905,11 @@
                                 window.location.href = '/create-testcase';
                             } else {
                                 console.error("❌ Mobile Testing submission failed:", data);
+                                if (typeof data === 'object' && data !== null) {
+                                    displayValidationErrors(data);
+                                } else if (typeof data === 'string') {
+                                    alert(data);
+                                }
                             }
                         })
                         .catch(error => console.error("Upload failed:", error));
@@ -1841,6 +1946,11 @@
                                 window.location.href = '/create-testcase';
                             } else {
                                 console.error("❌ API Testing submission failed:", data);
+                                if (typeof data === 'object' && data !== null) {
+                                    displayValidationErrors(data);
+                                } else if (typeof data === 'string') {
+                                    alert(data);
+                                }
                             }
                         })
                         .catch(error => console.error("Upload failed:", error));
@@ -1853,117 +1963,575 @@
 
         <script>
             function loadNotifications() {
+
                 console.log("▶️ Starting to load notifications...");
 
                 fetch('/notifications')
                     .then(response => {
-                        console.log("📡 Fetch response status:", response.status);
+
+                        if (!response.ok) {
+                            throw new Error("Failed to load notifications");
+                        }
+
                         return response.json();
                     })
                     .then(data => {
-                        console.log("✅ Notifications data received:", data);
+                        console.log("✅ Notifications received:", data);
 
-                        const dropdown = document.getElementById('notificationDropdown');
+                        // Update red badge
+                        updateNotificationBadge(data);
+
+
+                        console.log("✅ Notifications received:", data);
+
+                        const dropdown =
+                            document.getElementById('notificationDropdown');
+
                         dropdown.innerHTML = "";
 
                         // =========================
                         // HEADER
                         // =========================
-                        dropdown.innerHTML += `
+
+                        dropdown.innerHTML = `
           <div class="notification-header d-flex justify-content-between px-4 py-3 brdr-btm-1">
+
             <div class="col-sm-6">
               <p class="para-f3 dmsans-semibold text-color1 mb-0">
                 Notifications
-                <span class="badge badge-circle">${data.length}</span>
+                <span class="badge badge-circle">
+                  ${data.length}
+                </span>
               </p>
             </div>
+
             <div class="col-sm-6 text-end">
-              <a href="#" id="markAllRead" class="para-f3 text-color3 dmsans-semibold">
+              <a href="#"
+                 id="markAllRead"
+                 class="para-f3 text-color3 dmsans-semibold">
                 Mark all as read
               </a>
             </div>
+
           </div>
         `;
 
+
                         // =========================
-                        // SCROLLABLE NOTIFICATION LIST
+                        // NOTIFICATION LIST
                         // =========================
-                        const notificationList = document.createElement('div');
-                        notificationList.className = 'notification-list';
+
+                        const notificationList =
+                            document.createElement('div');
+
+                        notificationList.className =
+                            'notification-list';
+
 
                         if (!data || data.length === 0) {
-                            console.log("ℹ️ No notifications found.");
+
                             notificationList.innerHTML = `
             <div class="p-4 text-center">
-              <p class="para-f4 text-color6 mb-0">No notifications</p>
+              <p class="para-f4 text-color6 mb-0">
+                No notifications
+              </p>
             </div>
           `;
+
                         } else {
-                            console.log(`📋 Rendering ${data.length} notifications...`);
+
                             data.forEach(note => {
+
                                 notificationList.innerHTML += `
+
               <div class="brdr-btm-1 d-flex bg-color2 p-3">
+
                 <div class="col-auto">
-                  <img src="/assets/images/test-execution.svg" alt="Icon" />
+                  <img
+                    src="/assets/images/test-execution.svg"
+                    alt="Icon">
                 </div>
+
                 <div class="col-11">
-                  <p class="para-f4 dmsans-semibold px-3 text-color1 mb-1">
+
+                  <p class="para-f4 dmsans-semibold
+                            px-3 text-color1 mb-1">
+
                     ${note.title}
-                    <span class="dot bg-color3 ms-1 mt-2"></span>
+
+                    ${!note.read ? '<span class="dot bg-color3 ms-1 mt-2"></span>' : ''}
+
                   </p>
-                  <p class="para-f4 px-3 text-color6 mb-1">${note.message}</p>
-                  <p class="para-f4 px-3 text-color6 mb-0">${note.timeAgo}</p>
+
+                  <p class="para-f4 px-3 text-color6 mb-1">
+                    ${note.message}
+                  </p>
+
+                  <p class="para-f4 px-3 text-color6 mb-0">
+                    ${note.timeAgo}
+                  </p>
+
                 </div>
+
               </div>
+
             `;
                             });
                         }
 
                         dropdown.appendChild(notificationList);
 
+
                         // =========================
                         // FOOTER
                         // =========================
-                        dropdown.innerHTML += `
-          <div class="notification-footer py-3 px-3">
-            <a class="dropdown-item text-color3 dmsans-semibold text-center" href="/notificationsall">
-              View all notifications
-            </a>
-          </div>
+
+                        const footer =
+                            document.createElement('div');
+
+                        footer.className =
+                            'notification-footer py-3 px-3';
+
+                        footer.innerHTML = `
+
+          <a href="#"
+             id="viewAllNotifications"
+             class="dropdown-item text-color3
+                    dmsans-semibold text-center">
+
+            View all notifications
+
+          </a>
+
         `;
 
+                        dropdown.appendChild(footer);
+
+
                         // =========================
-                        // UPDATE BADGE
+                        // VIEW ALL CLICK
                         // =========================
-                        const badge = document.getElementById('notificationBadge');
-                        if (badge) {
-                            badge.textContent = data.length;
-                            console.log("🔔 Badge updated with count:", data.length);
+
+                        document
+                            .getElementById('viewAllNotifications')
+                            .addEventListener('click', function (event) {
+
+                                event.preventDefault();
+                                event.stopPropagation();
+
+                                loadAllNotifications();
+
+                            });
+
+
+                        // =========================
+                        // MARK ALL READ
+                        // =========================
+
+                        const markAllRead =
+                            document.getElementById('markAllRead');
+
+                        if (markAllRead) {
+
+                            markAllRead.addEventListener(
+                                'click',
+                                function (event) {
+
+                                    event.preventDefault();
+                                    event.stopPropagation();
+
+                                    markAllNotificationsRead();
+
+                                }
+                            );
                         }
 
-                        console.log("✅ Notifications rendered successfully.");
                     })
                     .catch(error => {
-                        console.error("❌ Error loading notifications:", error);
+
+                        console.error(
+                            "❌ Error loading notifications:",
+                            error
+                        );
+
                     });
             }
+
+
+            // =====================================================
+            // LOAD ALL NOTIFICATIONS
+            // =====================================================
+
+            function loadAllNotifications() {
+
+                console.log("▶️ Loading all notifications...");
+
+                fetch('/notificationsall')
+                    .then(response => {
+
+                        if (!response.ok) {
+                            throw new Error(
+                                "Failed to load all notifications"
+                            );
+                        }
+
+                        return response.json();
+
+                    })
+                    .then(data => {
+
+                        console.log(
+                            "✅ All notifications received:",
+                            data
+                        );
+
+                        const dropdown =
+                            document.getElementById('notificationDropdown');
+
+                        dropdown.innerHTML = "";
+
+
+                        // =========================
+                        // HEADER
+                        // =========================
+
+                        dropdown.innerHTML = `
+
+          <div class="notification-header
+                      d-flex justify-content-between
+                      px-4 py-3 brdr-btm-1">
+
+            <div class="col-sm-6">
+
+              <p class="para-f3 dmsans-semibold
+                        text-color1 mb-0">
+
+                All Notifications
+
+                <span class="badge badge-circle">
+                  ${data.length}
+                </span>
+
+              </p>
+
+            </div>
+
+            <div class="col-sm-6 text-end">
+
+              <a href="#"
+                 id="markAllRead"
+                 class="para-f3 text-color3
+                        dmsans-semibold">
+
+                Mark all as read
+
+              </a>
+
+            </div>
+
+          </div>
+
+        `;
+
+
+                        // =========================
+                        // LIST
+                        // =========================
+
+                        const notificationList =
+                            document.createElement('div');
+
+                        notificationList.className =
+                            'notification-list';
+
+
+                        if (!data || data.length === 0) {
+
+                            notificationList.innerHTML = `
+
+            <div class="p-4 text-center">
+
+              <p class="para-f4 text-color6 mb-0">
+                No notifications
+              </p>
+
+            </div>
+
+          `;
+
+                        } else {
+
+                            data.forEach(note => {
+
+                                notificationList.innerHTML += `
+
+              <div class="brdr-btm-1 d-flex bg-color2 p-3">
+
+                <div class="col-auto">
+
+                  <img
+                    src="/assets/images/test-execution.svg"
+                    alt="Icon">
+
+                </div>
+
+                <div class="col-11">
+
+                  <p class="para-f4 dmsans-semibold
+                            px-3 text-color1 mb-1">
+
+                    ${note.title}
+
+                    ${!note.read
+                                        ? '<span class="dot bg-color3 ms-1 mt-2"></span>'
+                                        : ''
+                                    }
+
+                  </p>
+
+                  <p class="para-f4 px-3 text-color6 mb-1">
+
+                    ${note.message}
+
+                  </p>
+
+                  <p class="para-f4 px-3 text-color6 mb-0">
+
+                    ${note.timeAgo}
+
+                  </p>
+
+                </div>
+
+              </div>
+
+            `;
+
+                            });
+
+                        }
+
+                        dropdown.appendChild(notificationList);
+
+
+                        // =========================
+                        // FOOTER
+                        // =========================
+
+                        const footer =
+                            document.createElement('div');
+
+                        footer.className =
+                            'notification-footer py-3 px-3';
+
+                        footer.innerHTML = `
+
+          <a href="#"
+             id="backToRecentNotifications"
+             class="dropdown-item text-color3
+                    dmsans-semibold text-center">
+
+            Back to recent notifications
+
+          </a>
+
+        `;
+
+                        dropdown.appendChild(footer);
+
+
+                        // =========================
+                        // BACK TO RECENT
+                        // =========================
+
+                        document
+                            .getElementById('backToRecentNotifications')
+                            .addEventListener(
+                                'click',
+                                function (event) {
+
+                                    event.preventDefault();
+                                    event.stopPropagation();
+
+                                    loadNotifications();
+
+                                }
+                            );
+
+
+                        // =========================
+                        // MARK ALL READ
+                        // =========================
+
+                        const markAllRead =
+                            document.getElementById('markAllRead');
+
+                        if (markAllRead) {
+
+                            markAllRead.addEventListener(
+                                'click',
+                                function (event) {
+
+                                    event.preventDefault();
+                                    event.stopPropagation();
+
+                                    markAllNotificationsRead();
+
+                                }
+                            );
+
+                        }
+
+                    })
+                    .catch(error => {
+
+                        console.error(
+                            "❌ Error loading all notifications:",
+                            error
+                        );
+
+                    });
+            }
+
+
+            // =====================================================
+            // MARK ALL NOTIFICATIONS AS READ
+            // =====================================================
+
+            function markAllNotificationsRead() {
+
+                const csrfToken =
+                    document.querySelector('meta[name="_csrf"]').content;
+
+                const csrfHeader =
+                    document.querySelector('meta[name="_csrf_header"]').content;
+
+
+                fetch('/notifications/mark-all-read', {
+
+                    method: 'POST',
+
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    }
+
+                })
+                    .then(response => {
+
+                        if (!response.ok) {
+                            throw new Error(
+                                "Failed to mark notifications as read"
+                            );
+                        }
+
+                        return response.text();
+
+                    })
+                    .then(data => {
+
+                        console.log(
+                            "✅ All notifications marked as read"
+                        );
+
+                        // Hide notification badge immediately
+                        const badge =
+                            document.getElementById('notificationBadge');
+
+                        if (badge) {
+                            badge.style.display = 'none';
+                        }
+                        loadNotifications();
+
+                    })
+                    .catch(error => {
+
+                        console.error(
+                            "❌ Error marking notifications as read:",
+                            error
+                        );
+
+                    });
+
+            }
         </script>
-
-
         <script>
-            document.addEventListener("click", function (e) {
-                if (e.target && e.target.textContent.includes("Mark all as read")) {
-                    e.preventDefault();
-                    fetch('/notifications/mark-all-read', { method: 'POST' })
-                        .then(response => response.text())
-                        .then(result => {
-                            if (result === "success") {
-                                // Optionally reload notifications
-                                loadNotifications();
-                            }
-                        });
+            // ==========================================
+            // CHECK FOR NEW NOTIFICATIONS
+            // ==========================================
+
+            function checkForNewNotifications() {
+
+                fetch('/notifications')
+                    .then(response => {
+
+                        if (!response.ok) {
+                            throw new Error(
+                                'Failed to check notifications'
+                            );
+                        }
+
+                        return response.json();
+
+                    })
+                    .then(data => {
+
+                        updateNotificationBadge(data);
+
+                    })
+                    .catch(error => {
+
+                        console.error(
+                            'Error checking notifications:',
+                            error
+                        );
+
+                    });
+            }
+
+
+            // Check immediately when page loads
+            checkForNewNotifications();
+
+
+            // Check every 5 seconds
+            setInterval(
+                checkForNewNotifications,
+                5000
+            );
+
+
+            // ==========================================
+            // UPDATE NOTIFICATION BADGE
+            // ==========================================
+
+            function updateNotificationBadge(notifications) {
+
+                const badge =
+                    document.getElementById('notificationBadge');
+
+                if (!badge) {
+                    return;
                 }
-            });
+
+                // Count only unread notifications
+                const unreadCount =
+                    notifications.filter(note => note.read === false).length;
+
+                if (unreadCount > 0) {
+
+                    // New/unread notification exists
+                    badge.style.display = 'block';
+
+                } else {
+
+                    // No unread notifications
+                    badge.style.display = 'none';
+
+                }
+            }
+
+
+
         </script>
 
         <script th:src="@{assets/js/tw-scripts.js}"></script>

@@ -86,7 +86,7 @@
                         onclick="loadNotifications()">
                         <!-- <i class="fa-regular fa-bell fs-4"></i> -->
                         <img th:src="@{/assets/images/bell-icon.svg}" alt="icon" />
-                        <span class="badge-dot"></span>
+                        <span class="badge-dot" id="notificationBadge"></span>
                     </div>
                     <!-- Dropdown menu -->
                     <div class="dropdown-menu w-420 py-0 custom-dropdown" id="notificationDropdown">
@@ -203,6 +203,12 @@
                             </div>
                         </div>
                     </div>
+                    <script>
+                        function clearCreatedBy() {
+                            document.querySelectorAll('input[name="createdBy"]').forEach(cb => cb.checked = false);
+                        }
+                    </script>
+
 
 
                 </div>
@@ -371,107 +377,6 @@
             </div>
         </div>
 
-
-
-
-        <script>
-            function loadNotifications() {
-                console.log("▶️ Starting to load notifications...");
-
-                fetch('/notifications')
-                    .then(response => {
-                        console.log("📡 Fetch response status:", response.status);
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log("✅ Notifications data received:", data);
-
-                        const dropdown = document.getElementById('notificationDropdown');
-                        dropdown.innerHTML = "";
-
-                        // =========================
-                        // HEADER
-                        // =========================
-                        dropdown.innerHTML += `
-          <div class="notification-header d-flex justify-content-between px-4 py-3 brdr-btm-1">
-            <div class="col-sm-6">
-              <p class="para-f3 dmsans-semibold text-color1 mb-0">
-                Notifications
-                <span class="badge badge-circle">${data.length}</span>
-              </p>
-            </div>
-            <div class="col-sm-6 text-end">
-              <a href="#" id="markAllRead" class="para-f3 text-color3 dmsans-semibold">
-                Mark all as read
-              </a>
-            </div>
-          </div>
-        `;
-
-                        // =========================
-                        // SCROLLABLE NOTIFICATION LIST
-                        // =========================
-                        const notificationList = document.createElement('div');
-                        notificationList.className = 'notification-list';
-
-                        if (!data || data.length === 0) {
-                            console.log("ℹ️ No notifications found.");
-                            notificationList.innerHTML = `
-            <div class="p-4 text-center">
-              <p class="para-f4 text-color6 mb-0">No notifications</p>
-            </div>
-          `;
-                        } else {
-                            console.log(`📋 Rendering ${data.length} notifications...`);
-                            data.forEach(note => {
-                                notificationList.innerHTML += `
-              <div class="brdr-btm-1 d-flex bg-color2 p-3">
-                <div class="col-auto">
-                  <img src="/assets/images/test-execution.svg" alt="Icon" />
-                </div>
-                <div class="col-11">
-                  <p class="para-f4 dmsans-semibold px-3 text-color1 mb-1">
-                    ${note.title}
-                    <span class="dot bg-color3 ms-1 mt-2"></span>
-                  </p>
-                  <p class="para-f4 px-3 text-color6 mb-1">${note.message}</p>
-                  <p class="para-f4 px-3 text-color6 mb-0">${note.timeAgo}</p>
-                </div>
-              </div>
-            `;
-                            });
-                        }
-
-                        dropdown.appendChild(notificationList);
-
-                        // =========================
-                        // FOOTER
-                        // =========================
-                        dropdown.innerHTML += `
-          <div class="notification-footer py-3 px-3">
-            <a class="dropdown-item text-color3 dmsans-semibold text-center" href="/notificationsall">
-              View all notifications
-            </a>
-          </div>
-        `;
-
-                        // =========================
-                        // UPDATE BADGE
-                        // =========================
-                        const badge = document.getElementById('notificationBadge');
-                        if (badge) {
-                            badge.textContent = data.length;
-                            console.log("🔔 Badge updated with count:", data.length);
-                        }
-
-                        console.log("✅ Notifications rendered successfully.");
-                    })
-                    .catch(error => {
-                        console.error("❌ Error loading notifications:", error);
-                    });
-            }
-        </script>
-
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const editModal = document.getElementById('editProject');
@@ -562,6 +467,580 @@
 
             });
         </script>
+
+        <script>
+            function loadNotifications() {
+
+                console.log("▶️ Starting to load notifications...");
+
+                fetch('/notifications')
+                    .then(response => {
+
+                        if (!response.ok) {
+                            throw new Error("Failed to load notifications");
+                        }
+
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("✅ Notifications received:", data);
+
+                        // Update red badge
+                        updateNotificationBadge(data);
+
+
+                        console.log("✅ Notifications received:", data);
+
+                        const dropdown =
+                            document.getElementById('notificationDropdown');
+
+                        dropdown.innerHTML = "";
+
+                        // =========================
+                        // HEADER
+                        // =========================
+
+                        dropdown.innerHTML = `
+          <div class="notification-header d-flex justify-content-between px-4 py-3 brdr-btm-1">
+
+            <div class="col-sm-6">
+              <p class="para-f3 dmsans-semibold text-color1 mb-0">
+                Notifications
+                <span class="badge badge-circle">
+                  ${data.length}
+                </span>
+              </p>
+            </div>
+
+            <div class="col-sm-6 text-end">
+              <a href="#"
+                 id="markAllRead"
+                 class="para-f3 text-color3 dmsans-semibold">
+                Mark all as read
+              </a>
+            </div>
+
+          </div>
+        `;
+
+
+                        // =========================
+                        // NOTIFICATION LIST
+                        // =========================
+
+                        const notificationList =
+                            document.createElement('div');
+
+                        notificationList.className =
+                            'notification-list';
+
+
+                        if (!data || data.length === 0) {
+
+                            notificationList.innerHTML = `
+            <div class="p-4 text-center">
+              <p class="para-f4 text-color6 mb-0">
+                No notifications
+              </p>
+            </div>
+          `;
+
+                        } else {
+
+                            data.forEach(note => {
+
+                                notificationList.innerHTML += `
+
+              <div class="brdr-btm-1 d-flex bg-color2 p-3">
+
+                <div class="col-auto">
+                  <img
+                    src="/assets/images/test-execution.svg"
+                    alt="Icon">
+                </div>
+
+                <div class="col-11">
+
+                  <p class="para-f4 dmsans-semibold
+                            px-3 text-color1 mb-1">
+
+                    ${note.title}
+
+                    ${!note.read ? '<span class="dot bg-color3 ms-1 mt-2"></span>' : ''}
+
+                  </p>
+
+                  <p class="para-f4 px-3 text-color6 mb-1">
+                    ${note.message}
+                  </p>
+
+                  <p class="para-f4 px-3 text-color6 mb-0">
+                    ${note.timeAgo}
+                  </p>
+
+                </div>
+
+              </div>
+
+            `;
+                            });
+                        }
+
+                        dropdown.appendChild(notificationList);
+
+
+                        // =========================
+                        // FOOTER
+                        // =========================
+
+                        const footer =
+                            document.createElement('div');
+
+                        footer.className =
+                            'notification-footer py-3 px-3';
+
+                        footer.innerHTML = `
+
+          <a href="#"
+             id="viewAllNotifications"
+             class="dropdown-item text-color3
+                    dmsans-semibold text-center">
+
+            View all notifications
+
+          </a>
+
+        `;
+
+                        dropdown.appendChild(footer);
+
+
+                        // =========================
+                        // VIEW ALL CLICK
+                        // =========================
+
+                        document
+                            .getElementById('viewAllNotifications')
+                            .addEventListener('click', function (event) {
+
+                                event.preventDefault();
+                                event.stopPropagation();
+
+                                loadAllNotifications();
+
+                            });
+
+
+                        // =========================
+                        // MARK ALL READ
+                        // =========================
+
+                        const markAllRead =
+                            document.getElementById('markAllRead');
+
+                        if (markAllRead) {
+
+                            markAllRead.addEventListener(
+                                'click',
+                                function (event) {
+
+                                    event.preventDefault();
+                                    event.stopPropagation();
+
+                                    markAllNotificationsRead();
+
+                                }
+                            );
+                        }
+
+                    })
+                    .catch(error => {
+
+                        console.error(
+                            "❌ Error loading notifications:",
+                            error
+                        );
+
+                    });
+            }
+
+
+            // =====================================================
+            // LOAD ALL NOTIFICATIONS
+            // =====================================================
+
+            function loadAllNotifications() {
+
+                console.log("▶️ Loading all notifications...");
+
+                fetch('/notificationsall')
+                    .then(response => {
+
+                        if (!response.ok) {
+                            throw new Error(
+                                "Failed to load all notifications"
+                            );
+                        }
+
+                        return response.json();
+
+                    })
+                    .then(data => {
+
+                        console.log(
+                            "✅ All notifications received:",
+                            data
+                        );
+
+                        const dropdown =
+                            document.getElementById('notificationDropdown');
+
+                        dropdown.innerHTML = "";
+
+
+                        // =========================
+                        // HEADER
+                        // =========================
+
+                        dropdown.innerHTML = `
+
+          <div class="notification-header
+                      d-flex justify-content-between
+                      px-4 py-3 brdr-btm-1">
+
+            <div class="col-sm-6">
+
+              <p class="para-f3 dmsans-semibold
+                        text-color1 mb-0">
+
+                All Notifications
+
+                <span class="badge badge-circle">
+                  ${data.length}
+                </span>
+
+              </p>
+
+            </div>
+
+            <div class="col-sm-6 text-end">
+
+              <a href="#"
+                 id="markAllRead"
+                 class="para-f3 text-color3
+                        dmsans-semibold">
+
+                Mark all as read
+
+              </a>
+
+            </div>
+
+          </div>
+
+        `;
+
+
+                        // =========================
+                        // LIST
+                        // =========================
+
+                        const notificationList =
+                            document.createElement('div');
+
+                        notificationList.className =
+                            'notification-list';
+
+
+                        if (!data || data.length === 0) {
+
+                            notificationList.innerHTML = `
+
+            <div class="p-4 text-center">
+
+              <p class="para-f4 text-color6 mb-0">
+                No notifications
+              </p>
+
+            </div>
+
+          `;
+
+                        } else {
+
+                            data.forEach(note => {
+
+                                notificationList.innerHTML += `
+
+              <div class="brdr-btm-1 d-flex bg-color2 p-3">
+
+                <div class="col-auto">
+
+                  <img
+                    src="/assets/images/test-execution.svg"
+                    alt="Icon">
+
+                </div>
+
+                <div class="col-11">
+
+                  <p class="para-f4 dmsans-semibold
+                            px-3 text-color1 mb-1">
+
+                    ${note.title}
+
+                    ${!note.read
+                                        ? '<span class="dot bg-color3 ms-1 mt-2"></span>'
+                                        : ''
+                                    }
+
+                  </p>
+
+                  <p class="para-f4 px-3 text-color6 mb-1">
+
+                    ${note.message}
+
+                  </p>
+
+                  <p class="para-f4 px-3 text-color6 mb-0">
+
+                    ${note.timeAgo}
+
+                  </p>
+
+                </div>
+
+              </div>
+
+            `;
+
+                            });
+
+                        }
+
+                        dropdown.appendChild(notificationList);
+
+
+                        // =========================
+                        // FOOTER
+                        // =========================
+
+                        const footer =
+                            document.createElement('div');
+
+                        footer.className =
+                            'notification-footer py-3 px-3';
+
+                        footer.innerHTML = `
+
+          <a href="#"
+             id="backToRecentNotifications"
+             class="dropdown-item text-color3
+                    dmsans-semibold text-center">
+
+            Back to recent notifications
+
+          </a>
+
+        `;
+
+                        dropdown.appendChild(footer);
+
+
+                        // =========================
+                        // BACK TO RECENT
+                        // =========================
+
+                        document
+                            .getElementById('backToRecentNotifications')
+                            .addEventListener(
+                                'click',
+                                function (event) {
+
+                                    event.preventDefault();
+                                    event.stopPropagation();
+
+                                    loadNotifications();
+
+                                }
+                            );
+
+
+                        // =========================
+                        // MARK ALL READ
+                        // =========================
+
+                        const markAllRead =
+                            document.getElementById('markAllRead');
+
+                        if (markAllRead) {
+
+                            markAllRead.addEventListener(
+                                'click',
+                                function (event) {
+
+                                    event.preventDefault();
+                                    event.stopPropagation();
+
+                                    markAllNotificationsRead();
+
+                                }
+                            );
+
+                        }
+
+                    })
+                    .catch(error => {
+
+                        console.error(
+                            "❌ Error loading all notifications:",
+                            error
+                        );
+
+                    });
+            }
+
+
+            // =====================================================
+            // MARK ALL NOTIFICATIONS AS READ
+            // =====================================================
+
+            function markAllNotificationsRead() {
+
+                const csrfToken =
+                    document.querySelector('meta[name="_csrf"]').content;
+
+                const csrfHeader =
+                    document.querySelector('meta[name="_csrf_header"]').content;
+
+
+                fetch('/notifications/mark-all-read', {
+
+                    method: 'POST',
+
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    }
+
+                })
+                    .then(response => {
+
+                        if (!response.ok) {
+                            throw new Error(
+                                "Failed to mark notifications as read"
+                            );
+                        }
+
+                        return response.text();
+
+                    })
+                    .then(data => {
+
+                        console.log(
+                            "✅ All notifications marked as read"
+                        );
+
+                        // Hide notification badge immediately
+                        const badge =
+                            document.getElementById('notificationBadge');
+
+                        if (badge) {
+                            badge.style.display = 'none';
+                        }
+                        loadNotifications();
+
+                    })
+                    .catch(error => {
+
+                        console.error(
+                            "❌ Error marking notifications as read:",
+                            error
+                        );
+
+                    });
+
+            }
+        </script>
+        <script>
+            // ==========================================
+            // CHECK FOR NEW NOTIFICATIONS
+            // ==========================================
+
+            function checkForNewNotifications() {
+
+                fetch('/notifications')
+                    .then(response => {
+
+                        if (!response.ok) {
+                            throw new Error(
+                                'Failed to check notifications'
+                            );
+                        }
+
+                        return response.json();
+
+                    })
+                    .then(data => {
+
+                        updateNotificationBadge(data);
+
+                    })
+                    .catch(error => {
+
+                        console.error(
+                            'Error checking notifications:',
+                            error
+                        );
+
+                    });
+            }
+
+
+            // Check immediately when page loads
+            checkForNewNotifications();
+
+
+            // Check every 5 seconds
+            setInterval(
+                checkForNewNotifications,
+                5000
+            );
+
+
+            // ==========================================
+            // UPDATE NOTIFICATION BADGE
+            // ==========================================
+
+            function updateNotificationBadge(notifications) {
+
+                const badge =
+                    document.getElementById('notificationBadge');
+
+                if (!badge) {
+                    return;
+                }
+
+                // Count only unread notifications
+                const unreadCount =
+                    notifications.filter(note => note.read === false).length;
+
+                if (unreadCount > 0) {
+
+                    // New/unread notification exists
+                    badge.style.display = 'block';
+
+                } else {
+
+                    // No unread notifications
+                    badge.style.display = 'none';
+
+                }
+            }
+
+
+
+        </script>
+
 
 
 
