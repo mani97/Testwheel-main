@@ -91,7 +91,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        http.csrf(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/signup", "/verify", "/check-email", "/login", "/assets/**", "/css/**",
                                 "/js/**",
@@ -106,11 +106,10 @@ public class SecurityConfig {
                         .failureHandler(failureHandler) // use custom handler
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
+                        // .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
                         .deleteCookies("JSESSIONID", "accessToken")
-                        .invalidateHttpSession(true)
-                        .permitAll())
+                        .invalidateHttpSession(true))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .invalidSessionUrl("/timeout")
@@ -118,11 +117,10 @@ public class SecurityConfig {
                         .sessionRegistry(sessionRegistry)
                         .expiredUrl("/timeout"))
                 .exceptionHandling(ex -> ex
-                        .accessDeniedPage("/err") // 👈 page for 403 forbidden
+                        .accessDeniedPage("/timeout") // 👈 page for 403 forbidden
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.sendRedirect("/err"); // 👈 page for 401 unauthorized
-                        }))
-                .csrf(Customizer.withDefaults());
+                        }));
 
         return http.build();
     }

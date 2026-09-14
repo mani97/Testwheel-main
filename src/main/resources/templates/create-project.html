@@ -255,23 +255,26 @@
                             </div>
                             <div class="row p-t-16 px-3">
                                 <label for="projectName" class="form-label px-0">Project Name *</label>
-                                <input type="text" th:field="*{projectName}" id="projectName"
-                                    class="form-control form-input" placeholder="e.g. My Web App" aria-describedby=""
-                                    required>
-                                <small id="projectNameError" class="text-color9 px-0 pt-1"></small>
-                                <small th:if="${#fields.hasErrors('projectName')}" th:errors="*{projectName}"
-                                    style="color:red; font-weight:bold;"></small>
-                                <!-- <div id="" class="text-color9 px-0 pt-1">Enter Project Name</div> -->
+                                <input type="text" maxlength="150" th:field="*{projectName}" id="projectName"
+                                    class="form-control form-input" placeholder="e.g. My Web App" aria-describedby="">
+                                <small id="projectNameError" class="text-color9 px-0 pt-1"
+                                    style="color:red; font-weight:bold;" th:if="${#fields.hasErrors('projectName')}"
+                                    th:errors="*{projectName}"></small>
+                                <small id="projectNameError" class="text-color9 px-0 pt-1"
+                                    style="color:red; font-weight:bold;"
+                                    th:unless="${#fields.hasErrors('projectName')}"></small>
                             </div>
                             <div class="row p-t-24 px-3">
                                 <label for="projectUrl" class="form-label px-0">Project URL*</label>
-                                <input type="text" maxlength="500" th:field="*{projectUrl}" id="projectUrl"
+                                <input type="text" th:field="*{projectUrl}" id="projectUrl"
                                     class="form-control form-input" placeholder="e.g. app.testwheel.com"
                                     aria-describedby="">
-                                <small id="projectUrlError" class="text-color9 px-0 pt-1"></small>
-                                <small th:if="${#fields.hasErrors('projectUrl')}" th:errors="*{projectUrl}"
-                                    style="color:red; font-weight:bold;"></small>
-                                <!-- <div id="" class="text-color9 px-0 pt-1">Enter Project URL</div> -->
+                                <small id="projectUrlError" class="text-color9 px-0 pt-1"
+                                    style="color:red; font-weight:bold;" th:if="${#fields.hasErrors('projectUrl')}"
+                                    th:errors="*{projectUrl}"></small>
+                                <small id="projectUrlError" class="text-color9 px-0 pt-1"
+                                    style="color:red; font-weight:bold;"
+                                    th:unless="${#fields.hasErrors('projectUrl')}"></small>
                             </div>
                             <!-- Success message -->
                             <div id="successMessage" class="text-center mt-2" style="display: none;">
@@ -289,92 +292,83 @@
     </form>
 
     <script>
-        document.getElementById("createProjectBtn").addEventListener("click", function (event) {
-            event.preventDefault();
-
+        document.addEventListener("DOMContentLoaded", function () {
             const projectNameInput = document.getElementById("projectName");
             const projectUrlInput = document.getElementById("projectUrl");
             const projectNameError = document.getElementById("projectNameError");
             const projectUrlError = document.getElementById("projectUrlError");
 
-            const projectName = projectNameInput ? projectNameInput.value.trim() : "";
-            const projectUrl = projectUrlInput ? projectUrlInput.value.trim() : "";
 
-            let valid = true;
+            const createProjectBtn = document.getElementById("createProjectBtn");
+            if (createProjectBtn) {
+                createProjectBtn.addEventListener("click", function (event) {
+                    event.preventDefault();
 
-            // Project Name validation
-            if (!projectName) {
-                projectNameError.textContent = "Project Name is required";
-                projectNameError.style.color = "red";
-                projectNameError.style.fontWeight = "bold";
-                valid = false;
-            } else {
-                projectNameError.textContent = "";
-            }
 
-            // Project URL validation
-            const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
-            if (!projectUrl) {
-                projectUrlError.textContent = "Project URL is required!";
-                projectUrlError.style.color = "red";
-                projectUrlError.style.fontWeight = "bold";
-                valid = false;
-            } else if (!urlPattern.test(projectUrl)) {
-                projectUrlError.textContent = "Enter a valid project URL (e.g. app.testwheel.com)";
-                projectUrlError.style.color = "red";
-                projectUrlError.style.fontWeight = "bold";
-                valid = false;
-            } else {
-                projectUrlError.textContent = "";
-            }
 
-            if (!valid) {
-                return;
-            }
+                    const projectName = projectNameInput.value.trim();
+                    const projectUrl = projectUrlInput.value.trim();
 
-            const csrfTokenInput = document.querySelector('input[name="_csrf"]');
-            const csrfMetaToken = document.querySelector('meta[name="_csrf"]');
-            const csrfMetaHeader = document.querySelector('meta[name="_csrf_header"]');
+                    const csrfTokenInput = document.querySelector('input[name="_csrf"]');
+                    const csrfMetaToken = document.querySelector('meta[name="_csrf"]');
+                    const csrfMetaHeader = document.querySelector('meta[name="_csrf_header"]');
 
-            const csrfToken = csrfTokenInput ? csrfTokenInput.value : (csrfMetaToken ? csrfMetaToken.getAttribute("content") : "");
-            const csrfHeader = csrfMetaHeader ? csrfMetaHeader.getAttribute("content") : "X-CSRF-TOKEN";
+                    const csrfToken = csrfTokenInput ? csrfTokenInput.value : (csrfMetaToken ? csrfMetaToken.getAttribute("content") : "");
+                    const csrfHeader = csrfMetaHeader ? csrfMetaHeader.getAttribute("content") : "X-CSRF-TOKEN";
 
-            const headers = {
-                "Content-Type": "application/json"
-            };
-            if (csrfToken) {
-                headers[csrfHeader] = csrfToken;
-            }
-
-            fetch("/saveproject", {
-                method: "POST",
-                headers: headers,
-                body: JSON.stringify({
-                    projectName: projectName,
-                    projectUrl: projectUrl
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const msgDiv = document.getElementById("successMessage");
-                        const msgText = document.getElementById("successMessageText");
-                        if (msgDiv && msgText) {
-                            msgText.textContent = data.message;
-                            msgDiv.style.display = "block";
-                        }
-
-                        setTimeout(() => {
-                            window.location.href = "/testlist";
-                        }, 1500);
-                    } else {
-                        alert(data.message || "Failed to save project.");
+                    const headers = {
+                        "Content-Type": "application/json"
+                    };
+                    if (csrfToken) {
+                        headers[csrfHeader] = csrfToken;
                     }
-                })
-                .catch(error => {
-                    console.error("Error saving project:", error);
-                    alert("Unable to save project. Please try again.");
+
+                    fetch("/saveproject", {
+                        method: "POST",
+                        headers: headers,
+                        body: JSON.stringify({
+                            projectName: projectName,
+                            projectUrl: projectUrl
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const msgDiv = document.getElementById("successMessage");
+                                const msgText = document.getElementById("successMessageText");
+                                if (msgDiv && msgText) {
+                                    msgText.textContent = data.message;
+                                    msgDiv.style.display = "block";
+                                }
+
+                                setTimeout(() => {
+                                    window.location.href = "/testlist";
+                                }, 1500);
+                            } else if (data.errors) {
+                                if (data.errors.projectName) {
+                                    projectNameError.textContent = data.errors.projectName;
+                                    projectNameError.style.color = "red";
+                                    projectNameError.style.fontWeight = "bold";
+                                } else {
+                                    projectNameError.textContent = "";
+                                }
+                                if (data.errors.projectUrl) {
+                                    projectUrlError.textContent = data.errors.projectUrl;
+                                    projectUrlError.style.color = "red";
+                                    projectUrlError.style.fontWeight = "bold";
+                                } else {
+                                    projectUrlError.textContent = "";
+                                }
+                            } else {
+                                alert(data.message || "Failed to save project.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error saving project:", error);
+                            alert("Unable to save project. Please try again.");
+                        });
                 });
+            }
         });
     </script>
 

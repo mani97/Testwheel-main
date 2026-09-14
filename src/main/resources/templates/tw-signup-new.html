@@ -628,37 +628,37 @@
     }
     // =========================
     // Phone - Optional
-    // =========================
-    // const phone = phoneInput.value.trim();
+    //   =========================
+    const phone = phoneInput.value.trim();
 
-    // if (phone) {
+    if (phone) {
 
-    //   const phoneRegex = /^[0-9]{5,15}$/;
+      const phoneRegex = /^[0-9]{5,15}$/;
 
-    //   if (!phoneRegex.test(phone)) {
+      if (!phoneRegex.test(phone)) {
 
-    //     phoneFeedback.textContent = "Phone must be 5–15 digits";
-    //     phoneFeedback.style.color = "red";
+        phoneFeedback.textContent = "Phone must be 5–15 digits";
+        phoneFeedback.style.color = "red";
 
-    //     phoneInput.classList.add("error-border");
-    //     phoneInput.classList.remove("valid-border");
+        phoneInput.classList.add("error-border");
+        phoneInput.classList.remove("valid-border");
 
-    //     isValid = false;
+        isValid = false;
 
-    //   } else {
+      } else {
 
-    //     phoneFeedback.textContent = "";
+        phoneFeedback.textContent = "";
 
-    //     phoneInput.classList.remove("error-border");
-    //     phoneInput.classList.add("valid-border");
-    //   }
+        phoneInput.classList.remove("error-border");
+        phoneInput.classList.add("valid-border");
+      }
 
-    // } else {
+    } else {
 
-    //   // Phone is optional
-    //   phoneFeedback.textContent = "";
-    //   phoneInput.classList.remove("error-border", "valid-border");
-    // }
+      // Phone is optional
+      phoneFeedback.textContent = "";
+      phoneInput.classList.remove("error-border", "valid-border");
+    }
 
 
     // =========================

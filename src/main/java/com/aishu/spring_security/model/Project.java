@@ -29,7 +29,7 @@ public class Project {
     private int projectId;
 
     @NotBlank(message = "Project Name is required")
-    @Size(max = 255, message = "Project name must be under 255 characters")
+    @Size(max = 150, message = "Project name must be under 150 characters")
     private String projectName;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,8 +38,8 @@ public class Project {
     private User createdBy;
 
     @NotBlank(message = "Project URL is required")
-    @Size(max = 500, message = "Project URL must be under 500 characters")
-    @Column(length = 500)
+    @Size(max = 200, message = "Project URL must be under 200 characters")
+    @Column(length = 200)
     private String projectUrl;
 
     @ManyToOne

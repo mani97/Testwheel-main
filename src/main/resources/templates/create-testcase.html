@@ -144,6 +144,40 @@
                     //let selectedProjectId = sessionStorage.getItem('SelectedProjectId');
 
                     function loadProjects() {
+
+
+                        // Check URL or localStorage for platform parameter
+                        const params = new URLSearchParams(window.location.search);
+                        let platform = params.get("platform");
+                        if (!platform) {
+                            platform = localStorage.getItem("selectedPlatform");
+                        }
+                        const step = params.get("step");
+                        // Restore platform
+                        if (platform) {
+                            selectedItem = platform;
+                            localStorage.setItem("selectedPlatform", platform);
+
+                            // Restore selected platform card
+                            document.querySelectorAll('.card-select').forEach(card => {
+                                card.classList.remove('active');
+
+                                const onclickValue = card.getAttribute('onclick');
+
+                                if (onclickValue && onclickValue.includes(platform)) {
+                                    card.classList.add('active');
+                                }
+                            });
+
+                            // Repopulate Step 2 form fields for restored platform
+                            restoreStep2Data(platform);
+                        }
+
+                        if (step === "3" && selectedItem) {
+                            showStep(3);
+                        }
+
+
                         /*
                          * Step 1: Fetch the session-stored selected project,
                          * then load all projects.
@@ -200,6 +234,15 @@
                             .catch(error => {
                                 console.error("Error loading projects:", error);
                             });
+                        // Restore requested step 
+                        if (step === "3" && selectedItem) {
+                            showStep(3);
+                        } else if (step === "2" && selectedItem) {
+                            showStep(2);
+                        } else {
+                            showStep(1);
+                        }
+
                     }
 
 
@@ -476,7 +519,7 @@
 
                                 if (iconSlot) {
                                     iconSlot.innerHTML =
-                                        '<i class="fa-solid fa-check text-success"></i>';
+                                        '<img src="/assets/images/project-check-icon.svg" alt="Selected" class="project-check-icon">';
                                 }
 
 
@@ -507,7 +550,7 @@
                             if (String(itemProjectId) === String(selectedProjectId)) {
                                 const iconSlot = item.querySelector('.icon-slot');
                                 if (iconSlot) {
-                                    iconSlot.innerHTML = '<i class="fa-solid fa-check text-success"></i>';
+                                    iconSlot.innerHTML = '<img src="/assets/images/project-check-icon.svg" alt="Selected" class="project-check-icon">';
                                 }
                             }
                         });
@@ -518,11 +561,28 @@
                     /*
                      * Load projects once page is ready
                      */
-                    document.addEventListener(
-                        'DOMContentLoaded',
-                        function () {
-                            loadProjects();
-                        }
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const step2Fields = [
+                            "productName",
+                            "modules",
+                            "tagInput",
+                            "description"
+                        ];
+                        step2Fields.forEach(id => {
+
+                            const element = document.getElementById(id);
+
+                            if (element) {
+                                element.addEventListener("input", saveStep2Data);
+                                element.addEventListener("change", saveStep2Data);
+                            }
+
+                        });
+
+                        // Restore Step 2 data after page reload
+                        restoreStep2Data();
+                        loadProjects();
+                    }
                     );
                 </script>
 
@@ -955,7 +1015,7 @@
                                     <div class="col-md-6">
                                         <button
                                             class="btn btn-border-bg dmsans-semibold w-100 px-lg-4 p-t-12 p-b-12 text-color1"
-                                            onclick="goToStep(1)">Back</button>
+                                            onclick="goBack()">Back</button>
                                     </div>
                                     <div class="col-md-6 m-t-24 mt-md-0">
                                         <button type="button"
@@ -1214,7 +1274,83 @@
         <script>
             let selectedItem = "";
 
-            function clearAllFormData() {
+            function getActivePlatform() {
+                const params = new URLSearchParams(window.location.search);
+                return selectedItem || params.get("platform") || localStorage.getItem("selectedPlatform") || "";
+            }
+
+            function saveStep2Data() {
+                const platform = getActivePlatform();
+                if (!platform) return;
+
+                const data = {
+                    productName: document.getElementById("productName")?.value || "",
+                    modules: document.getElementById("modules")?.value || "",
+                    tagInput: document.getElementById("tagInput")?.value || "",
+                    description: document.getElementById("description")?.value || ""
+                };
+
+                localStorage.setItem("step2_" + platform, JSON.stringify(data));
+                localStorage.setItem("selectedPlatform", platform);
+            }
+
+            function restoreStep2Data(platform) {
+                const targetPlatform = platform || getActivePlatform();
+                if (!targetPlatform) return;
+
+                const productNameEl = document.getElementById("productName");
+                const modulesEl = document.getElementById("modules");
+                const tagInputEl = document.getElementById("tagInput");
+                const descriptionEl = document.getElementById("description");
+
+                const storedDataStr = localStorage.getItem("step2_" + targetPlatform);
+
+                if (storedDataStr) {
+                    try {
+                        const data = JSON.parse(storedDataStr);
+                        if (productNameEl) productNameEl.value = data.productName || "";
+                        if (modulesEl) modulesEl.value = data.modules || "";
+                        if (tagInputEl) tagInputEl.value = data.tagInput || "";
+                        if (descriptionEl) descriptionEl.value = data.description || "";
+                    } catch (e) {
+                        console.error("Error parsing Step 2 data for platform " + targetPlatform, e);
+                    }
+                } else {
+                    const legacyTestName = localStorage.getItem("testName");
+                    const legacyModules = localStorage.getItem("modules");
+                    const legacyTag = localStorage.getItem("tag");
+                    const legacyDesc = localStorage.getItem("description");
+
+                    if (legacyTestName !== null || legacyModules !== null || legacyTag !== null || legacyDesc !== null) {
+                        if (productNameEl) productNameEl.value = legacyTestName || "";
+                        if (modulesEl) modulesEl.value = legacyModules || "";
+                        if (tagInputEl) tagInputEl.value = legacyTag || "";
+                        if (descriptionEl) descriptionEl.value = legacyDesc || "";
+                        saveStep2Data();
+                    } else {
+                        if (productNameEl) productNameEl.value = "";
+                        if (modulesEl) modulesEl.value = "";
+                        if (tagInputEl) tagInputEl.value = "";
+                        if (descriptionEl) descriptionEl.value = "";
+                    }
+                }
+            }
+
+            function clearStep2Storage(platform) {
+                const targetPlatform = platform || getActivePlatform();
+                if (targetPlatform) {
+                    localStorage.removeItem("step2_" + targetPlatform);
+                }
+                localStorage.removeItem("testName");
+                localStorage.removeItem("modules");
+                localStorage.removeItem("tag");
+                localStorage.removeItem("description");
+            }
+
+
+            function clearAllFormData(platform) {
+                clearStep2Storage(platform);
+
                 // Step 2 fields
                 const productName = document.getElementById("productName");
                 const modules = document.getElementById("modules");
@@ -1307,22 +1443,32 @@
 
             function selectItem(item, el) {
 
-                // If user selects a different platform,
-                // clear all previously entered data.
-                if (selectedItem !== "" && selectedItem !== item) {
-                    clearAllFormData();
+                // Save current platform data before switching
+                if (selectedItem) {
+                    saveStep2Data();
                 }
 
                 selectedItem = item;
+                localStorage.setItem("selectedPlatform", selectedItem);
+
+                // Save selected platform in URL
+                const url = new URL(window.location.href);
+                url.searchParams.set("platform", selectedItem);
+                url.searchParams.delete("step");
+                window.history.pushState({}, "", url);
+
+
                 // Remove active from all cards
                 document.querySelectorAll('.card-select').forEach(card => {
                     card.classList.remove('active');
                 });
                 // Add active to selected card  
-                el.classList.add('active');
+                if (el) {
+                    el.classList.add('active');
+                }
 
-                // Optional: keep platform in test name
-                //document.getElementById('productName').value = selectedItem;
+                // Repopulate form fields based on newly selected platform from localStorage
+                restoreStep2Data(selectedItem);
 
                 goToStep(2);
             }
@@ -1384,6 +1530,47 @@
 
             }
 
+            function goBack() {
+
+                const url = new URL(window.location.href);
+                const step = url.searchParams.get("step");
+                const platform = url.searchParams.get("platform");
+
+                // Step 3 → Step 2
+                if (step === "3") {
+                    url.searchParams.delete("step");
+
+                    if (platform) {
+                        url.searchParams.set("platform", platform);
+                    }
+
+                    window.history.pushState({}, "", url);
+                    showStep(2);
+                    restoreStep2Data();
+                    return;
+                }
+
+                // Step 2 → Step 1
+                if (platform) {
+                    url.searchParams.delete("platform");
+                    url.searchParams.delete("step");
+
+                    window.history.pushState({}, "", url);
+
+                    selectedItem = "";
+
+                    document.querySelectorAll(".card-select").forEach(card => {
+                        card.classList.remove("active");
+                    });
+
+                    showStep(1);
+                    return;
+                }
+
+                // Step 1 → previous browser page
+                window.history.back();
+            }
+
 
             function goToStep(step) {
 
@@ -1394,7 +1581,11 @@
                         alert("Please select a testing platform.");
                         return;
                     }
-
+                    // Keep platform in URL const 
+                    url = new URL(window.location.href);
+                    url.searchParams.set("platform", selectedItem); // Step 2 does not need ?step=2 
+                    url.searchParams.delete("step");
+                    window.history.pushState({}, "", url);
                     showStep(2);
                     return;
                 }
@@ -1409,7 +1600,14 @@
                         if (!isValid) {
                             return;
                         }
+                        // Save Step 2 data before moving to Step 3
+                        saveStep2Data();
+                        // Add step=3 to URL
+                        const url = new URL(window.location.href);
+                        url.searchParams.set("step", "3");
+                        url.searchParams.set("platform", selectedItem);
 
+                        window.history.pushState({}, "", url);
                         // IMPORTANT:
                         // Do NOT call goToStep(3) here.
                         // Call the actual navigation function.
@@ -1418,15 +1616,23 @@
 
                     return;
                 }
-
-                // Step 3 -> Step 2
-                if (step === 2) {
-                    showStep(2);
-                    return;
-                }
-
-                showStep(step);
             }
+
+            // Step 3 -> Step 2
+            function backToStep2() {
+
+                const url = new URL(window.location.href);
+                url.searchParams.set("platform", selectedItem);
+                // Remove step=3 
+                url.searchParams.delete("step");
+                window.history.pushState({}, "", url);
+                showStep(2);
+                // Restore Step 2 data
+                restoreStep2Data();
+
+            }
+
+
             function showStep(step) {
                 // Update stepper
                 document.querySelectorAll('.stepper-item').forEach((item, index) => {
@@ -1478,6 +1684,44 @@
                     }
                 }
             }
+
+            // browser Back Button navigation
+            window.addEventListener("popstate", function () {
+
+                const params = new URLSearchParams(window.location.search);
+
+                const platform = params.get("platform");
+                const step = params.get("step");
+
+                if (platform) {
+                    selectedItem = platform;
+
+                    document.querySelectorAll('.card-select').forEach(card => {
+
+                        card.classList.remove('active');
+
+                        const onclickValue = card.getAttribute('onclick');
+
+                        if (onclickValue && onclickValue.includes(platform)) {
+                            card.classList.add('active');
+                        }
+                    });
+                }
+
+                if (step === "3" && selectedItem) {
+                    showStep(3);
+                }
+                else if (selectedItem) {
+                    showStep(2);
+                }
+                else {
+                    showStep(1);
+                }
+
+                restoreStep2Data();
+            });
+
+
 
             function selectApiProtocol(card) {
                 document.querySelectorAll('.api-protocol-card').forEach(function (item) {
@@ -1859,6 +2103,9 @@
 
                             if (response.ok && data.success) {
                                 console.log("✅ Web Testing submission successful!");
+
+                                // Clear local storage on success
+                                clearStep2Storage('Web Testing');
                                 window.location.href = '/create-testcase';
                             } else {
                                 console.error("❌ Web Testing submission failed:", data);
@@ -1902,6 +2149,7 @@
 
                             if (response.ok && data.success) {
                                 console.log("✅ Mobile Testing submission successful!");
+                                clearStep2Storage('Mobile Testing');
                                 window.location.href = '/create-testcase';
                             } else {
                                 console.error("❌ Mobile Testing submission failed:", data);
@@ -1943,6 +2191,7 @@
 
                             if (response.ok && data.success) {
                                 console.log("✅ API Testing submission successful!");
+                                clearStep2Storage('API Testing');
                                 window.location.href = '/create-testcase';
                             } else {
                                 console.error("❌ API Testing submission failed:", data);
@@ -1955,6 +2204,8 @@
                         })
                         .catch(error => console.error("Upload failed:", error));
                 }
+
+
             }
 
         </script>

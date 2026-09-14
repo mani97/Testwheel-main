@@ -35,11 +35,15 @@ public class authController {
 
     // ---- Login ----
     @GetMapping("/login")
-    public String login(Model model, HttpSession session) {
+    public String login(@RequestParam(value = "logout", required = false) String logout, Model model,
+            HttpSession session) {
         String loginError = (String) session.getAttribute("loginError");
         if (loginError != null) {
             model.addAttribute("loginError", loginError);
             session.removeAttribute("loginError");
+        }
+        if (logout != null) {
+            model.addAttribute("message", "You have been logged out successfully.");
         }
 
         List<Map<String, Object>> countries = new ArrayList<>();
@@ -72,11 +76,11 @@ public class authController {
         return "tw-login";
     }
 
-    @GetMapping("/LoginErr")
-    public String LoginErr(Model model) {
-        model.addAttribute("user", new UserDto());
-        return "testwheel-404-error-page";
-    }
+    // @GetMapping("/LoginErr")
+    // public String LoginErr(Model model) {
+    // model.addAttribute("user", new UserDto());
+    // return "testwheel-404-error-page";
+    // }
 
     // ---- Register ----
     @GetMapping({ "/signup", "/" })
@@ -152,27 +156,36 @@ public class authController {
     }
 
     // ---- Logout (redirect) ----
-    @GetMapping("/perform_logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response, Model model) {
-        Cookie refreshCookie = CookieUtil.getCookie(request, "refreshToken");
-        if (refreshCookie != null) {
-            String refreshToken = refreshCookie.getValue();
-            try {
-                String username = jwtService.extractUsername(refreshToken);
-                if (username != null) {
-                    // jwtStoreService.revokeAllTokensForUser(username);
-                }
-            } catch (Exception e) {
-                // ignore if token invalid
-            }
-        }
-        // Clear cookies
-        response.addCookie(CookieUtil.deleteCookie("accessToken"));
-        response.addCookie(CookieUtil.deleteCookie("refreshToken"));
-        response.addCookie(CookieUtil.deleteCookie("jwt"));
+    // @PostMapping("/logout")
+    // public String logout(HttpServletRequest request, HttpServletResponse
+    // response, Model model) {
 
-        // Show logout page
-        model.addAttribute("message", "You have been logged out successfully.");
-        return "redirect:/login?logout";
-    }
+    // // Invalidate server session
+    // if (request.getSession(false) != null) {
+    // request.getSession(false).invalidate();
+    // }
+    // Cookie refreshCookie = CookieUtil.getCookie(request, "refreshToken");
+    // if (refreshCookie != null) {
+    // String refreshToken = refreshCookie.getValue();
+    // try {
+    // String username = jwtService.extractUsername(refreshToken);
+    // if (username != null) {
+    // // jwtStoreService.revokeAllTokensForUser(username);
+    // }
+    // } catch (Exception e) {
+    // // ignore if token invalid
+    // }
+    // }
+    // // Clear cookies
+    // response.addCookie(CookieUtil.deleteCookie("accessToken"));
+    // response.addCookie(CookieUtil.deleteCookie("refreshToken"));
+    // response.addCookie(CookieUtil.deleteCookie("jwt"));
+    // response.addCookie(CookieUtil.deleteCookie("XSRF-TOKEN"));
+    // response.addCookie(CookieUtil.deleteCookie("JSESSIONID"));
+    // response.addCookie(CookieUtil.deleteCookie("oauth"));
+
+    // // Show logout page
+    // model.addAttribute("message", "You have been logged out successfully.");
+    // return "redirect:/login?logout";
+    // }
 }

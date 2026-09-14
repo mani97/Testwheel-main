@@ -466,7 +466,8 @@
 
                 if (iconSlot) {
                   iconSlot.innerHTML =
-                    '<i class="fa-solid fa-check text-success"></i>';
+                    '<img src="/assets/images/project-check-icon.svg" alt="Selected" class="project-check-icon">';
+
                 }
 
 
@@ -497,7 +498,8 @@
               if (String(itemProjectId) === String(selectedProjectId)) {
                 const iconSlot = item.querySelector('.icon-slot');
                 if (iconSlot) {
-                  iconSlot.innerHTML = '<i class="fa-solid fa-check text-success"></i>';
+                  iconSlot.innerHTML = '<img src="/assets/images/project-check-icon.svg" alt="Selected" class="project-check-icon">';
+
                 }
               }
             });
@@ -522,8 +524,7 @@
       <div class="d-flex align-items-center gap-4">
         <a class="btn btn-create p-tb-12 p-lr-16 text-white d-md-block d-none button-f2"
           th:href="@{/create-testcase}"><img th:src="@{/assets/images/create-test-icon.svg}" alt="Icon" class="pe-2" />
-          Create
-          Test</a>
+          Create Test</a>
 
         <div class="dropdown">
           <!-- Bell icon trigger -->
@@ -570,6 +571,7 @@
                 <!--                <p sec:authorize="isAnonymous()"></p>-->
                 <p class="para-f4 px-3 text-color6" th:text="${currentUser.firstName}"></p>
                 <span th:text="${firstName}"></span>
+
               </div>
 
             </div>

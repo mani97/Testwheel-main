@@ -29,6 +29,9 @@ import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+
 @Controller
 public class projectController {
 
@@ -54,22 +57,35 @@ public class projectController {
 
     @PostMapping(value = "/saveproject", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Map<String, Object> saveProjectJson(@RequestBody Project project,
-            @ModelAttribute("currentUser") User currentUser, HttpSession session) {
+    public Map<String, Object> saveProjectJson(@Valid @RequestBody ProjectDto projectDto,
+            BindingResult bindingResult,
+            Authentication authentication, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+
+        if (bindingResult.hasErrors()) {
+            response.put("success", false);
+            response.put("message", "Validation failed");
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
+            response.put("errors", errors);
+            return response;
+        }
+        User currentUser = userRepo
+                .findByUsername(authentication.getName())
+                .orElseThrow();
+
+        Project project = new Project();
+        project.setProjectName(projectDto.getProjectName());
+        project.setProjectUrl(projectDto.getProjectUrl());
+
         if (currentUser != null) {
             project.setCreatedBy(currentUser);
             project.setUsername(currentUser);
             project.setCreatedAt(LocalDateTime.now());
-            // session.setAttribute("SelectedProjectId", project.getProjectId());// when
-            // coming into card itself store
-            // session
-            // session.setAttribute("SelectedProjectName", project.getProjectName());//
-            // information on first creation
         }
 
         Project saved = projectRepo.save(project);
 
-        Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("message", "Project saved successfully!");
         response.put("project", saved);
@@ -77,26 +93,33 @@ public class projectController {
         return response; // JSON response
     }
 
-    // @PostMapping(value = "/saveproject", consumes =
-    // MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    // @ResponseBody
-    // public Map<String, Object> saveProjectForm(@ModelAttribute Project project,
-    // @ModelAttribute("currentUser") User currentUser) {
-    // if (currentUser != null) {
-    // project.setCreatedBy(currentUser);
-    // project.setUsername(currentUser);
-    // project.setCreatedAt(LocalDateTime.now());
-    // }
+    @PostMapping(value = "/saveproject", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String saveProjectForm(@Valid @ModelAttribute("projectDto") ProjectDto projectDto,
+            BindingResult bindingResult,
+            @ModelAttribute("currentUser") User currentUser,
+            Model model) {
 
-    // Project saved = projectRepo.save(project);
+        if (bindingResult.hasErrors()) {
+            // redisplay the form with errors
+            return "create-project"; // Thymeleaf template name
+        }
 
-    // Map<String, Object> response = new HashMap<>();
-    // response.put("success", true);
-    // response.put("message", "Project saved successfully!");
-    // response.put("project", saved);
+        Project project = new Project();
+        project.setProjectName(projectDto.getProjectName());
+        project.setProjectUrl(projectDto.getProjectUrl());
 
-    // return response;
-    // }
+        if (currentUser != null) {
+            project.setCreatedBy(currentUser);
+            project.setUsername(currentUser);
+            project.setCreatedAt(LocalDateTime.now());
+        }
+
+        projectRepo.save(project);
+
+        // add success message for Thymeleaf
+        model.addAttribute("successMessage", "Project saved successfully!");
+        return "redirect:/testlist";
+    }
 
     @GetMapping("/projects")
     @ResponseBody
