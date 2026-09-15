@@ -74,19 +74,21 @@
                       <div class="col-md-6 m-b-24">
                         <label for="fname" class="form-label label-fnt dmsans-medium">First Name*</label>
                         <input type="text" th:field="*{firstName}" class="form-control input-bg"
+                          th:classappend="${#fields.hasErrors('firstName')} ? 'error-border' : ''"
                           placeholder="Enter First Name" id="fname">
                         <small id="fnameFeedback" class="d-block m-t-5"></small>
                         <small th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"
-                          style="color:red; font-weight:bold;"></small>
+                          class="d-block m-t-5 text-danger fw-bold"></small>
                       </div>
 
                       <div class="col-md-6 m-b-24">
                         <label for="lname" class="form-label label-fnt dmsans-medium">Last name*</label>
                         <input type="text" th:field="*{lastName}" class="form-control input-bg"
+                          th:classappend="${#fields.hasErrors('lastName')} ? 'error-border' : ''"
                           placeholder="Enter Last Name" id="lname">
                         <small id="lnameFeedback" class="d-block m-t-5"></small>
                         <small th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"
-                          style="color:red; font-weight:bold;"></small>
+                          class="d-block m-t-5 text-danger fw-bold"></small>
                       </div>
                     </div>
 
@@ -94,10 +96,11 @@
                       <div class="col-md-12 m-b-24">
                         <label for="email" class="form-label label-fnt dmsans-medium">Business email*</label>
                         <input type="email" th:field="*{username}" class="form-control input-bg"
+                          th:classappend="${#fields.hasErrors('username')} ? 'error-border' : ''"
                           placeholder="ex. email@domain.com" id="email">
                         <small id="usernameFeedback" class="d-block m-t-5"></small>
                         <small th:if="${#fields.hasErrors('username')}" th:errors="*{username}"
-                          style="color:red; font-weight:bold;"></small>
+                          class="d-block m-t-5 text-danger fw-bold"></small>
                       </div>
                     </div>
 
@@ -113,11 +116,12 @@
                           </select>
                           <span class="align-self-center color-input"> | </span>
                           <input type="tel" class="form-control input-bg brdr-radius-lft"
+                            th:classappend="${#fields.hasErrors('phone')} ? 'error-border' : ''"
                             placeholder="Enter phone number" id="phone" th:field="*{phone}">
                         </div>
                         <small id="phoneFeedback" class="d-block m-t-5"></small>
                         <small th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"
-                          style="color:red; font-weight:bold;"></small>
+                          class="d-block m-t-5 text-danger fw-bold"></small>
                       </div>
                     </div>
 
@@ -125,14 +129,15 @@
                       <div class="col-md-12 m-b-24">
                         <label for="password" class="form-label label-fnt dmsans-medium">Password*</label>
                         <div class="input-group bg-color1">
-                          <input type="password" class="form-control input-bg" placeholder="Enter Password"
-                            id="password" th:field="*{password}">
+                          <input type="password" class="form-control input-bg"
+                            th:classappend="${#fields.hasErrors('password')} ? 'error-border' : ''"
+                            placeholder="Enter Password" id="password" th:field="*{password}">
                           <i class="fa-solid toggle-password-eye text-color1 fa-eye" id="togglePassword"
                             style="cursor: pointer;"></i>
                         </div>
                         <small id="passwordStrengthFeedback" class="d-block m-t-5" style="font-weight: 500;"></small>
                         <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
-                          style="color:red; font-weight:bold;"></small>
+                          class="d-block m-t-5 text-danger fw-bold"></small>
                       </div>
                     </div>
 
@@ -141,14 +146,15 @@
                         <label for="confirmPassword" class="form-label label-fnt dmsans-medium">Confirm
                           Password*</label>
                         <div class="input-group bg-color1">
-                          <input type="password" class="form-control input-bg" placeholder="Confirm Password"
-                            id="confirmPassword" th:field="*{confirmPassword}">
+                          <input type="password" class="form-control input-bg"
+                            th:classappend="${#fields.hasErrors('confirmPassword')} ? 'error-border' : ''"
+                            placeholder="Confirm Password" id="confirmPassword" th:field="*{confirmPassword}">
                           <i class="fa-solid toggle-password-eye text-color1 fa-eye" id="togglePassword1"
                             style="cursor: pointer;"></i>
                         </div>
                         <small id="confirmPasswordFeedback" class="d-block m-t-5"></small>
                         <small th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"
-                          style="color:red; font-weight:bold;"></small>
+                          class="d-block m-t-5 text-danger fw-bold"></small>
                       </div>
                     </div>
 
@@ -225,15 +231,17 @@
   }, 5000);
 </script>
 
-<!-- <style>
-  .error-border {
-    border: 1px solid red !important;
-  }
+<style>
+  .error-border,
 
   .valid-border {
-    border: 1px solid green !important;
+    /* border: 1px solid #198754 !important;
+    box-shadow: none !important; */
+    border: none !important;
+    box-shadow: none !important;
   }
-</style> -->
+</style>
+
 
 <script>
   // Toggle Password Visibility

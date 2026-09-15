@@ -90,8 +90,8 @@ public class authController {
             java.net.URLConnection conn = new URL(
                     "https://raw.githubusercontent.com/samayo/country-json/master/src/country-by-calling-code.json")
                     .openConnection();
-            conn.setConnectTimeout(1500);
-            conn.setReadTimeout(1500);
+            conn.setConnectTimeout(2000);
+            conn.setReadTimeout(2000);
             ObjectMapper mapper = new ObjectMapper();
             countries = mapper.readValue(conn.getInputStream(), new TypeReference<List<Map<String, Object>>>() {
             });

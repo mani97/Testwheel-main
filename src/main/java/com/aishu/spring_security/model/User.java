@@ -17,7 +17,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment
     private int id;
 
-    @NotBlank(message = "First name is required")
+    @NotBlank(message = "First name is required!")
     @Column(nullable = false)
     private String firstName;
 

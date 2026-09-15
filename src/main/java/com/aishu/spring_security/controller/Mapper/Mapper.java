@@ -8,6 +8,7 @@ import com.aishu.spring_security.Dto.MobileTestingDto;
 import com.aishu.spring_security.Dto.ProjectCardDTO;
 import com.aishu.spring_security.Dto.Step2formDto;
 import com.aishu.spring_security.Dto.TestEntityDto;
+import com.aishu.spring_security.Dto.UserDto;
 import com.aishu.spring_security.Dto.WebTestingDto;
 import com.aishu.spring_security.model.TestEntity;
 import com.aishu.spring_security.model.User;
@@ -105,6 +106,19 @@ public class Mapper {
     // project.setCreatedBy(User user);
     // return project;
     // }
+
+    public static User userDtoToEntity(UserDto userDto) {
+        User user = new User();
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setUsername(userDto.getUsername());
+        user.setPassword(userDto.getPassword());
+        user.setConfirmPassword(userDto.getConfirmPassword());
+
+        user.setEnabled(userDto.isEnabled());
+
+        return user;
+    }
 
     public static List<ProjectCardDTO> toProjectCardDto(List<Project> projects) {
         return projects.stream()
