@@ -112,6 +112,8 @@ public class Mapper {
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setUsername(userDto.getUsername());
+        user.setPhoneCode(userDto.getPhoneCode());
+        user.setPhone(userDto.getPhone());
         user.setPassword(userDto.getPassword());
         user.setConfirmPassword(userDto.getConfirmPassword());
 
