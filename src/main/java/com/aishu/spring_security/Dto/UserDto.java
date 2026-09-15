@@ -30,7 +30,7 @@ public class UserDto {
     @NotBlank(message = "Email is required")
     @Email(message = "Enter a valid email")
     @Column(nullable = false, unique = true)
-    @Size(max = 25, message = "Email must be less than 15 characters!!")
+    @Size(max = 30, message = "Email must be less than 30 characters!!")
     private String username;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
